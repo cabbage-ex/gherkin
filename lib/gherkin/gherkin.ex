@@ -1,5 +1,9 @@
 defmodule Gherkin do
 
+  def parse(text) do
+    Gherkin.Parser.parse_feature(text)
+  end
+
   defmodule Elements do
 
     defmodule Feature do

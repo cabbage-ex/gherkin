@@ -13,34 +13,39 @@ defmodule Gherkin.Parser do
     %{feature | scenarios: Enum.reverse(scenarios)}
   end
 
-  defp process_lines(string) do
+  def process_lines(%File.Stream{line_or_bytes: :line} = stream) do
+    {:ok, output} = Enum.reduce(stream, {:ok, []}, &process_line/2)
+
+    Enum.reverse(output)
+  end
+  def process_lines(string) do
     {:ok, output} =
       string |> String.split(~r/\r?\n/, trim: true)
-             |> Enum.reduce({:ok, []}, &__MODULE__.process_line/2)
+             |> Enum.reduce({:ok, []}, &process_line/2)
 
     Enum.reverse(output)
   end
 
-  def process_line(line, {state, lines}) do
+  defp process_line(line, {state, lines}) do
     process_line(String.lstrip(line), {state, lines, line})
   end
 
   # Multiline / Doc string processing
-  def process_line(line = ~s(""") <> _, {:ok, lines, original_line}) do
+  defp process_line(line = ~s(""") <> _, {:ok, lines, original_line}) do
     indent_length = String.length(original_line) -
                     String.length(String.lstrip(original_line))
     {{:multiline, indent_length}, [ line | lines ]}
   end
-  def process_line(line = ~s(""") <> _, {{:multiline, _}, lines, _}) do
+  defp process_line(line = ~s(""") <> _, {{:multiline, _}, lines, _}) do
     {:ok, [ line | lines ]}
   end
-  def process_line(_, {{:multiline, indent} = state, lines, original_line}) do
+  defp process_line(_, {{:multiline, indent} = state, lines, original_line}) do
     {strippable, doc_string} = String.split_at(original_line, indent)
     {state, [ String.lstrip(strippable) <> doc_string | lines ]}
   end
 
   # Default processing
-  def process_line(line, {:ok, lines, _}), do: {:ok, [ line | lines ]}
+  defp process_line(line, {:ok, lines, _}), do: {:ok, [ line | lines ]}
 
   defp parse_each_line(lines) do
     {feature, _end_state} = lines
