@@ -2,6 +2,8 @@
 
 A Gherkin file parser written in Elixir. Parses `.feature` files and translates them to native Elixir terms for processing.
 
+Extracted from https://github.com/meadsteve/white-bread
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
