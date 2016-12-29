@@ -214,4 +214,8 @@ defmodule Gherkin.ParserTest do
     assert Enum.count(steps) == 4
   end
 
+  test "file streaming" do
+    assert %Gherkin.Elements.Feature{} = File.stream!("test/gherkin/parser/coffee.feature") |> parse_feature()
+  end
+
 end

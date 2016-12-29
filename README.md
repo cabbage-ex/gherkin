@@ -25,9 +25,9 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 ## Example Usage
 
 ```elixir
-%Gherkin.Feature{scenarios: scenarios} = File.read!("test/features/coffee.feature") |> Gherkin.parse()
+%Gherkin.Elements.Feature{scenarios: scenarios} = File.read!("test/features/coffee.feature") |> Gherkin.parse()
 # Do something with `scenarios`
 
 # Also supports file streams for larger files (must read by lines, bytes not supported)
-%Gherkin.Feature{scenarios: scenarios} = File.stream!("test/features/coffee.feature") |> Gherkin.parse()
+%Gherkin.Elements.Feature{scenarios: scenarios} = File.stream!("test/features/coffee.feature") |> Gherkin.parse()
 ```
