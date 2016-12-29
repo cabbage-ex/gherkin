@@ -1,5 +1,5 @@
-defmodule WhiteBread.Gherkin.Parser.Helpers.Steps do
-  alias WhiteBread.Gherkin.Elements.Steps, as: Steps
+defmodule Gherkin.Parser.Helpers.Steps do
+  alias Gherkin.Elements.Steps, as: Steps
 
   def process_background_step_line(line, feature) do
     %{background_steps: current_background_steps} = feature

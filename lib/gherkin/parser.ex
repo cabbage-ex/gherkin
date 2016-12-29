@@ -1,6 +1,6 @@
-defmodule WhiteBread.Gherkin.Parser do
-  alias WhiteBread.Gherkin.Elements.Feature, as: Feature
-  alias WhiteBread.Gherkin.Parser.GenericLine, as: LineParser
+defmodule Gherkin.Parser do
+  alias Gherkin.Elements.Feature, as: Feature
+  alias Gherkin.Parser.GenericLine, as: LineParser
 
   def parse_feature(feature_text) do
     feature_text

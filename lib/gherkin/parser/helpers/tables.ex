@@ -1,4 +1,4 @@
-defmodule WhiteBread.Gherkin.Parser.Helpers.Tables do
+defmodule Gherkin.Parser.Helpers.Tables do
 
   def process_step_table_line(line, feature) do
     %{scenarios: [scenario | rest]} = feature

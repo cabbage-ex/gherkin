@@ -1,6 +1,6 @@
-defmodule WhiteBread.Gherkin.TagParserTest do
+defmodule Gherkin.TagParserTest do
   use ExUnit.Case
-  import WhiteBread.Gherkin.Parser
+  import Gherkin.Parser
 
   @feature_with_single_feature_tag """
   @beverage

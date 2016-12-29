@@ -1,7 +1,7 @@
-defmodule WhiteBread.Gherkin.ParserTest do
+defmodule Gherkin.ParserTest do
   use ExUnit.Case
-  import WhiteBread.Gherkin.Parser
-  alias WhiteBread.Gherkin.Elements.Steps, as: Steps
+  import Gherkin.Parser
+  alias Gherkin.Elements.Steps, as: Steps
 
   @feature_text """
     Feature: Serve coffee
@@ -106,7 +106,7 @@ defmodule WhiteBread.Gherkin.ParserTest do
 
   @feature_with_role """
   Feature: Serve coffee
-    As a Barrista 
+    As a Barrista
     Coffee should not be served until paid for
     Coffee should not be served until the button has been pressed
     If there is no coffee left then money should be refunded

@@ -1,4 +1,4 @@
-defmodule WhiteBread.Gherkin.Parser.Helpers.DocString do
+defmodule Gherkin.Parser.Helpers.DocString do
 
   def stop_processing_doc_string(feature, prev_state)do
      { feature, prev_state }

@@ -1,6 +1,6 @@
-defmodule WhiteBread.Gherkin.Parser.Helpers.Scenario do
-  alias WhiteBread.Gherkin.Elements.Scenario
-  alias WhiteBread.Gherkin.Elements.ScenarioOutline
+defmodule Gherkin.Parser.Helpers.Scenario do
+  alias Gherkin.Elements.Scenario
+  alias Gherkin.Elements.ScenarioOutline
 
   def start_processing_scenario(feature, name, tags) do
     previous_scenarios = feature.scenarios

@@ -1,4 +1,4 @@
-defmodule WhiteBread.Gherkin do
+defmodule Gherkin do
 
   defmodule Elements do
 

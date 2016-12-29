@@ -1,10 +1,10 @@
-defmodule WhiteBread.Gherkin.Parser.GenericLine do
+defmodule Gherkin.Parser.GenericLine do
   require Logger
-  alias WhiteBread.Gherkin.Parser.Helpers.Feature, as: FeatureParser
-  alias WhiteBread.Gherkin.Parser.Helpers.Scenario, as: ScenarioParser
-  alias WhiteBread.Gherkin.Parser.Helpers.Steps, as: StepsParser
-  alias WhiteBread.Gherkin.Parser.Helpers.Tables, as: TableParser
-  alias WhiteBread.Gherkin.Parser.Helpers.DocString, as: DocStringParser
+  alias Gherkin.Parser.Helpers.Feature, as: FeatureParser
+  alias Gherkin.Parser.Helpers.Scenario, as: ScenarioParser
+  alias Gherkin.Parser.Helpers.Steps, as: StepsParser
+  alias Gherkin.Parser.Helpers.Tables, as: TableParser
+  alias Gherkin.Parser.Helpers.DocString, as: DocStringParser
 
   def process_line(line, state) do
     line

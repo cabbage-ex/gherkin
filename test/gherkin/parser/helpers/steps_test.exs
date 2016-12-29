@@ -1,6 +1,6 @@
-defmodule WhiteBread.Gherkin.Parser.StepsTest do
+defmodule Gherkin.Parser.StepsTest do
   use ExUnit.Case
-  import WhiteBread.Gherkin.Parser.Helpers.Steps
-  alias WhiteBread.Gherkin.Elements.Steps, as: Steps
-  doctest WhiteBread.Gherkin.Parser.Helpers.Steps
+  import Gherkin.Parser.Helpers.Steps
+  alias Gherkin.Elements.Steps, as: Steps
+  doctest Gherkin.Parser.Helpers.Steps
 end
