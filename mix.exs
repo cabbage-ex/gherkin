@@ -31,7 +31,10 @@ defmodule Gherkin.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:ex_doc, "~> 0.10", only: :dev},
+      {:earmark, "~> 0.1", only: :dev}
+    ]
   end
 
   defp aliases do
@@ -43,5 +46,5 @@ defmodule Gherkin.Mixfile do
     Mix.shell.info "Tagging release as #{@version}"
     System.cmd("git", ["tag", "-a", "v#{@version}", "-m", "v#{@version}"])
     System.cmd("git", ["push", "--tags"])
-  en
+  end
 end
