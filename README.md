@@ -6,13 +6,13 @@ Extracted from https://github.com/meadsteve/white-bread
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+The package can be installed as:
 
   1. Add `gherkin` to your list of dependencies in `mix.exs`:
 
     ```elixir
     def deps do
-      [{:gherkin, "~> 0.1.0"}]
+      [{:gherkin, "~> 1.0"}]
     end
     ```
 

@@ -1,13 +1,17 @@
 defmodule Gherkin.Mixfile do
   use Mix.Project
 
+  @version "1.0.0"
   def project do
-    [app: :gherkin,
-     version: "0.1.0",
-     elixir: "~> 1.2",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+    [
+      app: :gherkin,
+      version: @version,
+      elixir: "~> 1.2",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps(),
+      aliases: aliases()
+    ]
   end
 
   # Configuration for the OTP application
@@ -29,4 +33,15 @@ defmodule Gherkin.Mixfile do
   defp deps do
     []
   end
+
+  defp aliases do
+    [publish: ["hex.publish", "hex.publish docs", "tag"],
+     tag: &tag_release/1]
+  end
+
+  defp tag_release(_) do
+    Mix.shell.info "Tagging release as #{@version}"
+    System.cmd("git", ["tag", "-a", "v#{@version}", "-m", "v#{@version}"])
+    System.cmd("git", ["push", "--tags"])
+  en
 end
