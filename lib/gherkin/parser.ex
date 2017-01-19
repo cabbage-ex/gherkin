@@ -1,4 +1,5 @@
 defmodule Gherkin.Parser do
+  @moduledoc false
   alias Gherkin.Elements.Feature, as: Feature
   alias Gherkin.Parser.GenericLine, as: LineParser
 

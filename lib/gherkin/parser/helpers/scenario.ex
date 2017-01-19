@@ -1,4 +1,5 @@
 defmodule Gherkin.Parser.Helpers.Scenario do
+  @moduledoc false
   alias Gherkin.Elements.Scenario
   alias Gherkin.Elements.ScenarioOutline
 

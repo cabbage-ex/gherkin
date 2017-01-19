@@ -1,4 +1,5 @@
 defmodule Gherkin.Parser.GenericLine do
+  @moduledoc false
   require Logger
   alias Gherkin.Parser.Helpers.Feature, as: FeatureParser
   alias Gherkin.Parser.Helpers.Scenario, as: ScenarioParser

@@ -1,5 +1,5 @@
 defmodule Gherkin.Parser.Helpers.DocString do
-
+  @moduledoc false
   def stop_processing_doc_string(feature, prev_state)do
      { feature, prev_state }
   end

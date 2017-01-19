@@ -1,5 +1,5 @@
 defmodule Gherkin.Parser.Helpers.Tables do
-
+  @moduledoc false
   def process_step_table_line(line, feature) do
     %{scenarios: [scenario | rest]} = feature
     updated_scenario = scenario |> add_table_row_to_last_step(line)

@@ -1,4 +1,5 @@
 defmodule Gherkin.Parser.Helpers.Steps do
+  @moduledoc false
   alias Gherkin.Elements.Steps, as: Steps
 
   def process_background_step_line(line, feature) do
