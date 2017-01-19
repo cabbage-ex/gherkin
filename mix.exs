@@ -7,8 +7,16 @@ defmodule Gherkin.Mixfile do
       app: :gherkin,
       version: @version,
       elixir: "~> 1.2",
+      source_url: "git@github.com:cabbage-ex/gherkin.git",
+      homepage_url: "https://github.com/cabbage-ex/gherkin",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
+      description: "Gherkin file parser for Elixir",
+      docs: [
+        main: Gherkin,
+        readme: "README.md"
+      ],
+      package: package(),
       deps: deps(),
       aliases: aliases()
     ]
@@ -34,6 +42,14 @@ defmodule Gherkin.Mixfile do
     [
       {:ex_doc, "~> 0.10", only: :dev},
       {:earmark, "~> 0.1", only: :dev}
+    ]
+  end
+
+  defp package do
+    [
+      maintainers: ["Matt Widmann", "Steve B"],
+      licenses: ["MIT"],
+      links: %{github: "https://github.com/cabbage-ex/gherkin"}
     ]
   end
 
