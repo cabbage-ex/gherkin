@@ -6,7 +6,7 @@ defmodule Gherkin.Mixfile do
     [
       app: :gherkin,
       version: @version,
-      elixir: "~> 1.2",
+      elixir: "~> 1.1",
       source_url: "git@github.com:cabbage-ex/gherkin.git",
       homepage_url: "https://github.com/cabbage-ex/gherkin",
       build_embedded: Mix.env == :prod,
