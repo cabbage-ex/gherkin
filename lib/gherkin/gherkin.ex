@@ -63,4 +63,40 @@ defmodule Gherkin do
 
   end
 
+  @doc """
+  Changes a `Gherkin.Elements.ScenarioOutline` into multiple `Gherkin.Elements.Scenario`s
+  so that they may be executed in the same manner.
+
+  Given an outline, its easy to run all scenarios:
+
+      outline = %Gherkin.Elements.ScenarioOutline{}
+      Gherkin.scenarios_for(outline) |> Enum.each(&run_scenario/1)
+  """
+  def scenarios_for(outline = %Elements.ScenarioOutline{name: name, tags: tags, steps: steps, examples: examples}) do
+    examples
+    |> Enum.with_index()
+    |> Enum.map(fn({example, index}) ->
+      %Elements.Scenario{
+        name: name <> " Example #{index + 1}",
+        tags: tags,
+        steps: Enum.map(steps, fn(step)->
+          %{step | text: Enum.reduce(example, step.text, fn({k,v}, t)->
+            String.replace(t, ~r/<#{k}>/, v)
+          end)}
+        end)
+      }
+    end)
+  end
+
+  @doc """
+  Given a `Gherkin.Element.Feature`, changes all `Gherkin.Elements.ScenarioOutline`s
+  into `Gherkin.ElementScenario` as a flattened list of scenarios.
+  """
+  def flatten(feature = %Gherkin.Elements.Feature{scenarios: scenarios}) do
+    %{feature | scenarios: scenarios |> Enum.map(fn
+      scenario = %Gherkin.Elements.Scenario{} -> scenario # Nothing to do
+      outline = %Gherkin.Elements.ScenarioOutline{} -> scenarios_for(outline)
+    end) |> List.flatten()}
+  end
+
 end
