@@ -194,9 +194,8 @@ defmodule Gherkin.ParserTest do
 
   test "Reads Scenario outlines correctly" do
     exptected_example_data = [
-      ["start", "eat", "left"],
-      ["12",    "5",   "7"   ],
-      ["20",    "5",   "15"  ]
+      %{start: "12", eat: "5", left: "7"},
+      %{start: "20", eat: "5", left: "15"}
     ]
     expected_steps = [
       %Steps.Given{text: "there are <start> cucumbers"},
