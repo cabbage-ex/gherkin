@@ -23,7 +23,7 @@ defmodule Gherkin.GherkinTest do
   test "changing an outline into a scenario" do
     feature = @outline |> Gherkin.parse
     assert [%Gherkin.Elements.Scenario{
-      name: "Buy coffee Example 1",
+      name: "Buy coffee (Example 1)",
       steps: [
         %Gherkin.Elements.Steps.Given{text: "there are 12 coffees left in the machine"},
         %Gherkin.Elements.Steps.And{text: "I have deposited $6"},
@@ -31,7 +31,7 @@ defmodule Gherkin.GherkinTest do
         %Gherkin.Elements.Steps.Then{text: "I should be served 12 coffees"}
       ]
     }, %Gherkin.Elements.Scenario{
-      name: "Buy coffee Example 2",
+      name: "Buy coffee (Example 2)",
       steps: [
         %Gherkin.Elements.Steps.Given{text: "there are 2 coffees left in the machine"},
         %Gherkin.Elements.Steps.And{text: "I have deposited $3"},

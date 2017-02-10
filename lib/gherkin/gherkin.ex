@@ -77,7 +77,7 @@ defmodule Gherkin do
     |> Enum.with_index()
     |> Enum.map(fn({example, index}) ->
       %Elements.Scenario{
-        name: name <> " Example #{index + 1}",
+        name: name <> " (Example #{index + 1})",
         tags: tags,
         steps: Enum.map(steps, fn(step)->
           %{step | text: Enum.reduce(example, step.text, fn({k,v}, t)->
