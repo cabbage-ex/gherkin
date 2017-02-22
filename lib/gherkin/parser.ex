@@ -34,7 +34,7 @@ defmodule Gherkin.Parser do
   end
   def process_lines(string) do
     {:ok, output} =
-      string |> String.split(~r/\r?\n/, trim: true)
+      string |> String.split(~r/\r?\n/)
              |> Enum.reduce({:ok, []}, &process_line/2)
 
     Enum.reverse(output)
@@ -63,7 +63,8 @@ defmodule Gherkin.Parser do
 
   defp parse_each_line(lines) do
     {feature, _end_state} = lines
-    |> Enum.reduce({%Feature{}, :start}, &LineParser.process_line/2)
+      |> Enum.with_index(1)
+      |> Enum.reduce({%Feature{}, :start}, &LineParser.process_line/2)
     feature
   end
 
