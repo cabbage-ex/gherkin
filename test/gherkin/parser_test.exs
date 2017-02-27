@@ -218,4 +218,8 @@ defmodule Gherkin.ParserTest do
     assert %Gherkin.Elements.Feature{} = File.stream!("test/gherkin/parser/coffee.feature") |> parse_feature()
   end
 
+  test "Reads a feature with a single tag" do
+    assert %{tags: ["beverage"]} = parse_feature(@feature_with_single_feature_tag)
+  end
 end
+
