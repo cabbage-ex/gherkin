@@ -19,6 +19,12 @@ defmodule Gherkin do
     Gherkin.Parser.parse_feature(string_or_stream)
   end
 
+  def parse_file(file_name) do
+    file_name
+    |> File.read!()
+    |> Gherkin.Parser.parse_feature(file_name)
+  end
+
   defmodule Elements do
     @moduledoc false
     defmodule Feature do
@@ -31,7 +37,8 @@ defmodule Gherkin do
                 role: nil,
                 background_steps: [],
                 scenarios: [],
-                line: 0
+                line: 0,
+                file: nil
     end
 
     defmodule Scenario do
