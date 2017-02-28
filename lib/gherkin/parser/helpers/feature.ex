@@ -18,8 +18,8 @@ defmodule Gherkin.Parser.Helpers.Feature do
     }
   end
 
-  def start_processing_feature(feature, name, tags) do
-    {%{feature | name: rstrip(name), tags: tags}, :feature_description}
+  def start_processing_feature(feature, name, tags, line) do
+    {%{feature | name: rstrip(name), tags: tags, line: line}, :feature_description}
   end
 
   defp add_role(feature, role) do

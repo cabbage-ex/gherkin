@@ -19,6 +19,12 @@ defmodule Gherkin do
     Gherkin.Parser.parse_feature(string_or_stream)
   end
 
+  def parse_file(file_name) do
+    file_name
+    |> File.read!()
+    |> Gherkin.Parser.parse_feature(file_name)
+  end
+
   defmodule Elements do
     @moduledoc false
     defmodule Feature do
@@ -30,7 +36,9 @@ defmodule Gherkin do
                 tags: [],
                 role: nil,
                 background_steps: [],
-                scenarios: []
+                scenarios: [],
+                line: 0,
+                file: nil
     end
 
     defmodule Scenario do
@@ -39,7 +47,8 @@ defmodule Gherkin do
       """
       defstruct name: "",
                 tags: [],
-                steps: []
+                steps: [],
+                line: 0
     end
 
     defmodule ScenarioOutline do
@@ -49,16 +58,17 @@ defmodule Gherkin do
       defstruct name: "",
                 tags: [],
                 steps: [],
-                examples: []
+                examples: [],
+                line: 0
     end
 
     defmodule Steps do
       @moduledoc false
-      defmodule Given, do: defstruct text: "", table_data: [], doc_string: ""
-      defmodule When,  do: defstruct text: "", table_data: [], doc_string: ""
-      defmodule Then,  do: defstruct text: "", table_data: [], doc_string: ""
-      defmodule And,   do: defstruct text: "", table_data: [], doc_string: ""
-      defmodule But,   do: defstruct text: "", table_data: [], doc_string: ""
+      defmodule Given, do: defstruct text: "", table_data: [], doc_string: "", line: 0
+      defmodule When,  do: defstruct text: "", table_data: [], doc_string: "", line: 0
+      defmodule Then,  do: defstruct text: "", table_data: [], doc_string: "", line: 0
+      defmodule And,   do: defstruct text: "", table_data: [], doc_string: "", line: 0
+      defmodule But,   do: defstruct text: "", table_data: [], doc_string: "", line: 0
     end
 
   end
@@ -72,13 +82,14 @@ defmodule Gherkin do
       outline = %Gherkin.Elements.ScenarioOutline{}
       Gherkin.scenarios_for(outline) |> Enum.each(&run_scenario/1)
   """
-  def scenarios_for(outline = %Elements.ScenarioOutline{name: name, tags: tags, steps: steps, examples: examples}) do
+  def scenarios_for(outline = %Elements.ScenarioOutline{name: name, tags: tags, steps: steps, examples: examples, line: line}) do
     examples
     |> Enum.with_index()
     |> Enum.map(fn({example, index}) ->
       %Elements.Scenario{
         name: name <> " (Example #{index + 1})",
         tags: tags,
+        line: line,
         steps: Enum.map(steps, fn(step)->
           %{step | text: Enum.reduce(example, step.text, fn({k,v}, t)->
             String.replace(t, ~r/<#{k}>/, v)

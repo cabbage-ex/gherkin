@@ -2,6 +2,7 @@ defmodule Gherkin.ParserTest do
   use ExUnit.Case
   import Gherkin.Parser
   alias Gherkin.Elements.Steps, as: Steps
+  alias Gherkin.Elements.Feature
 
   @feature_text """
     Feature: Serve coffee
@@ -116,12 +117,12 @@ defmodule Gherkin.ParserTest do
   """
 
   test "Parses the feature name" do
-    %{name: name} = parse_feature(@feature_text)
+    assert %Feature{name: name, line: 1} = parse_feature(@feature_text)
     assert name == "Serve coffee"
   end
 
   test "Parses the feature description" do
-    %{description: description} = parse_feature(@feature_text)
+    assert %Feature{description: description, line: 1} = parse_feature(@feature_text)
     assert description == """
     Coffee should not be served until paid for
     Coffee should not be served until the button has been pressed
@@ -130,31 +131,31 @@ defmodule Gherkin.ParserTest do
   end
 
   test "Parses the feature role from an 'As a XXXX' line" do
-    %{role: role} = parse_feature(@feature_with_role)
+    assert %Feature{role: role, line: 1} = parse_feature(@feature_with_role)
     assert role == "Barrista"
   end
 
   test "reads in the correct number of scenarios" do
-    %{scenarios: scenarios} = parse_feature(@feature_text)
+    assert %Feature{scenarios: scenarios, line: 1} = parse_feature(@feature_text)
     assert Enum.count(scenarios) == 2
   end
 
   test "Gets the scenario's name" do
-    %{scenarios: [%{name: name} | _]} = parse_feature(@feature_text)
+    assert %Feature{scenarios: [%{name: name} | _], line: 1} = parse_feature(@feature_text)
     assert name == "Buy last coffee"
   end
 
   test "Gets the correct number of steps for the scenario" do
-    %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_text)
+    assert %Feature{scenarios: [%{steps: steps} | _], line: 1} = parse_feature(@feature_text)
     assert Enum.count(steps) == 4
   end
 
   test "Has the correct steps for a scenario" do
     expected_steps = [
-      %Steps.Given{text: "there are 1 coffees left in the machine"},
-      %Steps.And{text: "I have deposited 1$"},
-      %Steps.When{text: "I press the coffee button"},
-      %Steps.Then{text: "I should be served a coffee"},
+      %Steps.Given{text: "there are 1 coffees left in the machine", line: 7},
+      %Steps.And{text: "I have deposited 1$", line: 8},
+      %Steps.When{text: "I press the coffee button", line: 9},
+      %Steps.Then{text: "I should be served a coffee", line: 10}
     ]
     %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_text)
     assert expected_steps == steps
@@ -162,8 +163,8 @@ defmodule Gherkin.ParserTest do
 
   test "Parses the expected background steps" do
     expected_steps = [
-      %Steps.Given{text: "coffee exists as a beverage"},
-      %Steps.And{text: "there is a coffee machine"}
+      %Steps.Given{text: "coffee exists as a beverage", line: 7},
+      %Steps.And{text: "there is a coffee machine", line: 8}
     ]
     %{background_steps: background_steps} = parse_feature(@feature_with_backgroundtext)
     assert expected_steps == background_steps
@@ -172,8 +173,8 @@ defmodule Gherkin.ParserTest do
   test "Reads a doc string in to the correct step" do
     expected_data = "{\n  \"a\": \"b\"\n}\n"
     expected_steps = [
-      %Steps.Given{text: "the following data", doc_string: expected_data},
-      %Steps.Then{text: "everything should be okay"},
+      %Steps.Given{text: "the following data", doc_string: expected_data, line: 6},
+      %Steps.Then{text: "everything should be okay", line: 12},
     ]
     %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_with_doc_string)
     assert expected_steps == steps
@@ -185,8 +186,8 @@ defmodule Gherkin.ParserTest do
       ["Hello", "World"]
     ]
     expected_steps = [
-      %Steps.Given{text: "the following table", table_data: exptected_table_data},
-      %Steps.Then{text: "everything should be okay"},
+      %Steps.Given{text: "the following table", table_data: exptected_table_data, line: 5},
+      %Steps.Then{text: "everything should be okay", line: 8},
     ]
     %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_with_step_with_table)
     assert expected_steps == steps
@@ -198,17 +199,17 @@ defmodule Gherkin.ParserTest do
       %{start: "20", eat: "5", left: "15"}
     ]
     expected_steps = [
-      %Steps.Given{text: "there are <start> cucumbers"},
-      %Steps.When{text: "I eat <eat> cucumbers"},
-      %Steps.Then{text: "I should have <left> cucumbers"}
+      %Steps.Given{text: "there are <start> cucumbers", line: 4},
+      %Steps.When{text: "I eat <eat> cucumbers", line: 5},
+      %Steps.Then{text: "I should have <left> cucumbers", line: 6}
     ]
     %{scenarios: [%{steps: steps, examples: examples} | _]} = parse_feature(@feature_with_scenario_outline)
-    assert steps == expected_steps
-    assert examples == exptected_example_data
+    assert expected_steps == steps
+    assert exptected_example_data == examples
   end
 
   test "Commented out lines are ignored" do
-    %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature__with_comments)
+    assert %Feature{scenarios: [%{steps: steps} | _], line: 1} = parse_feature(@feature__with_comments)
     # Only should be 4 steps as the commented out line should be ignored
     assert Enum.count(steps) == 4
   end

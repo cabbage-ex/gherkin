@@ -5,12 +5,12 @@ defmodule Gherkin.Parser do
   alias Gherkin.Elements.Scenario
   alias Gherkin.Elements.ScenarioOutline
 
-  def parse_feature(feature_text) do
+  def parse_feature(feature_text, file_name \\ nil) do
     feature_text
-    |> process_lines
-    |> parse_each_line
-    |> correct_scenario_order
-    |> migrate_scenario_outline_examples
+    |> process_lines()
+    |> parse_each_line(file_name)
+    |> correct_scenario_order()
+    |> migrate_scenario_outline_examples()
   end
 
   defp correct_scenario_order(feature = %{scenarios: scenarios}) do
@@ -34,7 +34,7 @@ defmodule Gherkin.Parser do
   end
   def process_lines(string) do
     {:ok, output} =
-      string |> String.split(~r/\r?\n/, trim: true)
+      string |> String.split(~r/\r?\n/)
              |> Enum.reduce({:ok, []}, &process_line/2)
 
     Enum.reverse(output)
@@ -61,9 +61,10 @@ defmodule Gherkin.Parser do
   # Default processing
   defp process_line(line, {:ok, lines, _}), do: {:ok, [ line | lines ]}
 
-  defp parse_each_line(lines) do
+  defp parse_each_line(lines, file) do
     {feature, _end_state} = lines
-    |> Enum.reduce({%Feature{}, :start}, &LineParser.process_line/2)
+      |> Enum.with_index(1)
+      |> Enum.reduce({%Feature{file: file}, :start}, &LineParser.process_line/2)
     feature
   end
 
