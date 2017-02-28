@@ -53,6 +53,7 @@ defmodule Gherkin.ParserTest do
 
   @feature_with_multiple_feature_tag """
   @beverage @coffee
+  @caffeine
   Feature: Serve coffee
     Coffee should not be served until paid for
     Coffee should not be served until the button has been pressed
@@ -234,7 +235,7 @@ defmodule Gherkin.ParserTest do
   end
 
   test "Reads a feature with a multiple tags" do
-    assert %{tags: ["beverage", "coffee"]} = parse_feature(@feature_with_multiple_feature_tag)
+    assert %{tags: ["beverage", "coffee", "caffeine"]} = parse_feature(@feature_with_multiple_feature_tag)
   end
 end
 
