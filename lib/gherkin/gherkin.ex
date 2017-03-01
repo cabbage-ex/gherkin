@@ -82,7 +82,7 @@ defmodule Gherkin do
       outline = %Gherkin.Elements.ScenarioOutline{}
       Gherkin.scenarios_for(outline) |> Enum.each(&run_scenario/1)
   """
-  def scenarios_for(outline = %Elements.ScenarioOutline{name: name, tags: tags, steps: steps, examples: examples, line: line}) do
+  def scenarios_for(%Elements.ScenarioOutline{name: name, tags: tags, steps: steps, examples: examples, line: line}) do
     examples
     |> Enum.with_index()
     |> Enum.map(fn({example, index}) ->
