@@ -194,8 +194,7 @@ defmodule Gherkin.ParserTest do
 
   test "Reads a table in to the correct step" do
     exptected_table_data = [
-      ["Column one", "Column two"],
-      ["Hello", "World"]
+      %{:"Column one" => "Hello", :"Column two" => "World"}
     ]
     expected_steps = [
       %Steps.Given{text: "the following table", table_data: exptected_table_data, line: 5},
@@ -238,4 +237,3 @@ defmodule Gherkin.ParserTest do
     assert %{tags: ["beverage", "coffee", "caffeine"]} = parse_feature(@feature_with_multiple_feature_tag)
   end
 end
-

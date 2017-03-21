@@ -16,7 +16,7 @@ defmodule Gherkin.Parser.Helpers.Steps do
     updated_scenario = add_step_to_scenario(scenario, line, line_number)
     {
       %{feature | scenarios: [updated_scenario | rest]},
-      :scenario_steps
+      {:scenario_steps, []} # Empty keys state for tables
     }
   end
 

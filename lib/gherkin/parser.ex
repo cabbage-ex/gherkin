@@ -2,29 +2,16 @@ defmodule Gherkin.Parser do
   @moduledoc false
   alias Gherkin.Elements.Feature, as: Feature
   alias Gherkin.Parser.GenericLine, as: LineParser
-  alias Gherkin.Elements.Scenario
-  alias Gherkin.Elements.ScenarioOutline
 
   def parse_feature(feature_text, file_name \\ nil) do
     feature_text
     |> process_lines()
     |> parse_each_line(file_name)
     |> correct_scenario_order()
-    |> migrate_scenario_outline_examples()
   end
 
   defp correct_scenario_order(feature = %{scenarios: scenarios}) do
     %{feature | scenarios: Enum.reverse(scenarios)}
-  end
-
-  defp migrate_scenario_outline_examples(feature = %{scenarios: scenarios}) do
-    %{feature | scenarios: Enum.map(scenarios, &migrate_scenario_outline/1)}
-  end
-
-  defp migrate_scenario_outline(scenario = %Scenario{}), do: scenario
-  defp migrate_scenario_outline(outline = %ScenarioOutline{examples: [header | data]}) do
-    header = Enum.map(header, &String.to_atom/1)
-    %{outline | examples: Enum.map(data, &(header |> Enum.zip(&1) |> Enum.into(%{})))}
   end
 
   def process_lines(%File.Stream{line_or_bytes: :line} = stream) do

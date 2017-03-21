@@ -8,7 +8,7 @@ defmodule Gherkin.Parser.Helpers.Scenario do
     new_scenario = %Scenario{name: name, tags: tags, line: line}
     {
       %{feature | scenarios: [new_scenario | previous_scenarios]},
-      :scenario_steps
+      {:scenario_steps, []}
     }
   end
 
@@ -17,7 +17,7 @@ defmodule Gherkin.Parser.Helpers.Scenario do
     new_scenario_outline = %ScenarioOutline{name: name, tags: tags, line: line}
     {
       %{feature | scenarios: [new_scenario_outline | previous_scenarios]},
-      :scenario_steps
+      {:scenario_steps, []}
     }
   end
 

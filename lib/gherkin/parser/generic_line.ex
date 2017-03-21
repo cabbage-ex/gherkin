@@ -39,7 +39,7 @@ defmodule Gherkin.Parser.GenericLine do
   end
 
   defp process("Examples:" <> _, {feature, _}, _line_number) do
-    {feature, :scenario_outline_example}
+    {feature, {:scenario_outline_example, []}}
   end
 
   defp process("Scenario: " <> name, {feature, state}, line_number) do
@@ -71,13 +71,13 @@ defmodule Gherkin.Parser.GenericLine do
   end
 
   # Tables as part of a step
-  defp process("|" <> line, {feature, :scenario_steps}, _line_number) do
-    TableParser.process_step_table_line(line, feature)
+  defp process("|" <> line, {feature, {:scenario_steps, keys}}, _line_number) do
+    TableParser.process_step_table_line(line, feature, keys)
   end
 
   # Tables as part of an example for a scenario
-  defp process("|" <> line, {feature, :scenario_outline_example}, _line_number) do
-    TableParser.process_outline_table_line(line, feature)
+  defp process("|" <> line, {feature, {:scenario_outline_example, keys}}, _line_number) do
+    TableParser.process_outline_table_line(line, feature, keys)
   end
 
   defp process(line, {feature, :feature_description}, _line_number) do
@@ -88,7 +88,7 @@ defmodule Gherkin.Parser.GenericLine do
     StepsParser.process_background_step_line(line, feature, line_number)
   end
 
-  defp process(line, {feature, :scenario_steps}, line_number) do
+  defp process(line, {feature, {:scenario_steps, _}}, line_number) do
     StepsParser.process_scenario_step_line(line, feature, line_number)
   end
 
