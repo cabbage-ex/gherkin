@@ -21,18 +21,12 @@ defmodule Gherkin.Parser.GenericLine do
     state
   end
 
-  defp process("@" <> line, {feature, state = %{tags: tags}}, _line_number) do
+  defp process("@" <> line, {feature, %{tags: tags}}, _line_number) do
     {feature, %{tags: tags ++ process_tags(line)}}
   end
 
   defp process("@" <> line, {feature, _state}, _line_number) do
     {feature, %{tags: process_tags(line)}}
-  end
-
-  defp process_tags(line) do
-    line
-    |> String.split("@", trim: true)
-    |> Enum.map(&String.strip/1)
   end
 
   defp process("Feature: " <> name, {feature, state}, line_number) do
@@ -100,6 +94,12 @@ defmodule Gherkin.Parser.GenericLine do
 
   defp process(_line, state, _line_number) do
     state
+  end
+
+  defp process_tags(line) do
+    line
+    |> String.split("@", trim: true)
+    |> Enum.map(&String.strip/1)
   end
 
   defp log(line) do
