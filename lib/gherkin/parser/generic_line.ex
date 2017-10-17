@@ -99,7 +99,7 @@ defmodule Gherkin.Parser.GenericLine do
   defp process_tags(line) do
     line
     |> String.split("@", trim: true)
-    |> Enum.map(&String.strip/1)
+    |> Enum.map(&String.trim/1)
   end
 
   defp log(line) do

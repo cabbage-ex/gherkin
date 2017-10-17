@@ -28,13 +28,13 @@ defmodule Gherkin.Parser do
   end
 
   defp process_line(line, {state, lines}) do
-    process_line(String.lstrip(line), {state, lines, line})
+    process_line(String.trim_leading(line), {state, lines, line})
   end
 
   # Multiline / Doc string processing
   defp process_line(line = ~s(""") <> _, {:ok, lines, original_line}) do
     indent_length = String.length(original_line) -
-                    String.length(String.lstrip(original_line))
+                    String.length(String.trim_leading(original_line))
     {{:multiline, indent_length}, [ line | lines ]}
   end
   defp process_line(line = ~s(""") <> _, {{:multiline, _}, lines, _}) do
@@ -42,7 +42,7 @@ defmodule Gherkin.Parser do
   end
   defp process_line(_, {{:multiline, indent} = state, lines, original_line}) do
     {strippable, doc_string} = String.split_at(original_line, indent)
-    {state, [ String.lstrip(strippable) <> doc_string | lines ]}
+    {state, [ String.trim_leading(strippable) <> doc_string | lines ]}
   end
 
   # Default processing

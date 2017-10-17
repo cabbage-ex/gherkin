@@ -46,7 +46,7 @@ defmodule Gherkin.Parser.Helpers.Tables do
   defp table_line_to_columns(line) do
     line
     |> String.split("|", trim: true)
-    |> Enum.map(&String.strip/1)
+    |> Enum.map(&String.trim/1)
   end
 
 end

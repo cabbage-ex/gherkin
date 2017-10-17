@@ -1,6 +1,6 @@
 defmodule Gherkin.Parser.Helpers.Feature do
   @moduledoc false
-  import String, only: [rstrip: 1]
+  import String, only: [trim_trailing: 1, trim: 1]
 
   def process_feature_desc_line("As a " <> role = line, feature) do
     {
@@ -19,11 +19,11 @@ defmodule Gherkin.Parser.Helpers.Feature do
   end
 
   def start_processing_feature(feature, name, tags, line) do
-    {%{feature | name: rstrip(name), tags: tags, line: line}, :feature_description}
+    {%{feature | name: trim_trailing(name), tags: tags, line: line}, :feature_description}
   end
 
   defp add_role(feature, role) do
-    %{feature | role: String.strip(role)}
+    %{feature | role: trim(role)}
   end
 
   defp add_line_to_description(feature, line) do
