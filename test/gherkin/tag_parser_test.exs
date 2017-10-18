@@ -40,12 +40,12 @@ defmodule Gherkin.TagParserTest do
 
   test "Parses the feature with single tag" do
     %{tags: tags} = parse_feature(@feature_with_single_feature_tag)
-    assert tags == ["beverage"]
+    assert tags == [:beverage]
   end
 
   test "Parses the feature with many tags" do
     %{tags: tags} = parse_feature(@feature_with_many_feature_tags)
-    assert tags == ["beverage", "coffee", "happy"]
+    assert tags == [:beverage, :coffee, :happy]
   end
 
   test "Scenarios don't get feature tags" do
@@ -56,7 +56,7 @@ defmodule Gherkin.TagParserTest do
   test "Scenarios can get tags" do
     %{scenarios: [%{tags: scenario_tags} | [%{tags: untagged}]]} = parse_feature(@scenrio_with_tags)
     assert untagged == []
-    assert scenario_tags == ["important"]
+    assert scenario_tags == [:important]
   end
 
 end

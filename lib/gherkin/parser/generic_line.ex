@@ -99,7 +99,22 @@ defmodule Gherkin.Parser.GenericLine do
   defp process_tags(line) do
     line
     |> String.split("@", trim: true)
-    |> Enum.map(&String.trim/1)
+    |> Enum.map(&process_tag/1)
+  end
+
+  defp process_tag(tag) do
+    case tag |> String.trim() |> String.split(" ") do
+      [t] -> String.to_atom(t)
+      [t, v] ->
+        case Float.parse(v) do
+          {num, ""} ->
+            # Convert from float to int if it is exactly
+            num = if Float.floor(num) == num, do: round(num), else: num
+            {String.to_atom(t), num}
+          :error ->
+            {String.to_atom(t), v}
+        end
+    end
   end
 
   defp log(line) do

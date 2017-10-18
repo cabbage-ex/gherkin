@@ -51,6 +51,17 @@ defmodule Gherkin.ParserTest do
     Given there are 1 coffees left in the machine
   """
 
+  @feature_with_value_feature_tag """
+  @cost 1
+  Feature: Serve coffee
+    Coffee should not be served until paid for
+    Coffee should not be served until the button has been pressed
+    If there is no coffee left then money should be refunded
+
+  Scenario: Buy last coffee
+    Given there are 1 coffees left in the machine
+  """
+
   @feature_with_multiple_feature_tag """
   @beverage @coffee
   @caffeine
@@ -230,10 +241,14 @@ defmodule Gherkin.ParserTest do
   end
 
   test "Reads a feature with a single tag" do
-    assert %{tags: ["beverage"]} = parse_feature(@feature_with_single_feature_tag)
+    assert %{tags: [:beverage]} = parse_feature(@feature_with_single_feature_tag)
+  end
+
+  test "Reads a feature with a value tag" do
+    assert %{tags: [{:cost, 1}]} = parse_feature(@feature_with_value_feature_tag)
   end
 
   test "Reads a feature with a multiple tags" do
-    assert %{tags: ["beverage", "coffee", "caffeine"]} = parse_feature(@feature_with_multiple_feature_tag)
+    assert %{tags: [:beverage, :coffee, :caffeine]} = parse_feature(@feature_with_multiple_feature_tag)
   end
 end
