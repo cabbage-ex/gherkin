@@ -139,6 +139,16 @@ defmodule Gherkin.ParserTest do
     Given there are 1 coffees left in the machine
   """
 
+  @feature_with_scenario_with_no_name """
+  Feature: Serve coffee
+    Coffee should not be served until paid for
+    Coffee should not be served until the button has been pressed
+    If there is no coffee left then money should be refunded
+
+    Scenario:
+      Given there are 1 coffees left in the machine
+  """
+
   test "Parses the feature name" do
     assert %Feature{name: name, line: 1} = parse_feature(@feature_text)
     assert name == "Serve coffee"
@@ -161,6 +171,11 @@ defmodule Gherkin.ParserTest do
   test "reads in the correct number of scenarios" do
     assert %Feature{scenarios: scenarios, line: 1} = parse_feature(@feature_text)
     assert Enum.count(scenarios) == 2
+  end
+
+  test "Reads in scenarios with no name" do
+    assert %Feature{scenarios: scenarios, line: 1} = parse_feature(@feature_with_scenario_with_no_name)
+    assert Enum.count(scenarios) == 1
   end
 
   test "Gets the scenario's name" do

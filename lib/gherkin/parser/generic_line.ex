@@ -42,9 +42,9 @@ defmodule Gherkin.Parser.GenericLine do
     {feature, {:scenario_outline_example, []}}
   end
 
-  defp process("Scenario: " <> name, {feature, state}, line_number) do
+  defp process("Scenario:" <> name, {feature, state}, line_number) do
     tags = tags_from_state(state)
-    ScenarioParser.start_processing_scenario(feature, name, tags, line_number)
+    ScenarioParser.start_processing_scenario(feature, String.trim(name), tags, line_number)
   end
 
   defp process("Scenario Outline: " <> name, {feature, state}, line_number) do
