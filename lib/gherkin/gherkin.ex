@@ -84,10 +84,10 @@ defmodule Gherkin do
   """
   def scenarios_for(%Elements.ScenarioOutline{name: name, tags: tags, steps: steps, examples: examples, line: line}) do
     examples
-    |> Enum.with_index()
+    |> Enum.with_index(1)
     |> Enum.map(fn({example, index}) ->
       %Elements.Scenario{
-        name: name <> " (Example #{index + 1})",
+        name: name <> " (Example #{index})",
         tags: tags,
         line: line,
         steps: Enum.map(steps, fn(step)->
