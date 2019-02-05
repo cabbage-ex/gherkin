@@ -54,9 +54,10 @@ defmodule Gherkin.TagParserTest do
   end
 
   test "Scenarios can get tags" do
-    %{scenarios: [%{tags: scenario_tags} | [%{tags: untagged}]]} = parse_feature(@scenrio_with_tags)
+    %{scenarios: [%{tags: scenario_tags} | [%{tags: untagged}]]} =
+      parse_feature(@scenrio_with_tags)
+
     assert untagged == []
     assert scenario_tags == [:important]
   end
-
 end

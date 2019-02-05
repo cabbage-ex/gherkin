@@ -5,8 +5,8 @@ defmodule Gherkin.Parser.Helpers.Feature do
   def process_feature_desc_line("As a " <> role = line, feature) do
     {
       feature
-        |> add_role(role)
-        |> add_line_to_description(line),
+      |> add_role(role)
+      |> add_line_to_description(line),
       :feature_description
     }
   end
@@ -30,5 +30,4 @@ defmodule Gherkin.Parser.Helpers.Feature do
     %{description: current_description} = feature
     %{feature | description: current_description <> line <> "\n"}
   end
-
 end

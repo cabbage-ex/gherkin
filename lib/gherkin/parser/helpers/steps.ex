@@ -5,6 +5,7 @@ defmodule Gherkin.Parser.Helpers.Steps do
   def process_background_step_line(line, feature, line_number) do
     %{background_steps: current_background_steps} = feature
     new_step = string_to_step(line, line_number)
+
     {
       %{feature | background_steps: current_background_steps ++ [new_step]},
       :background_steps
@@ -14,9 +15,11 @@ defmodule Gherkin.Parser.Helpers.Steps do
   def process_scenario_step_line(line, feature, line_number) do
     %{scenarios: [scenario | rest]} = feature
     updated_scenario = add_step_to_scenario(scenario, line, line_number)
+
     {
       %{feature | scenarios: [updated_scenario | rest]},
-      {:scenario_steps, []} # Empty keys state for tables
+      # Empty keys state for tables
+      {:scenario_steps, []}
     }
   end
 
@@ -30,7 +33,7 @@ defmodule Gherkin.Parser.Helpers.Steps do
 
   """
   def add_step_to_scenario(scenario, line, line_number) do
-    step  = string_to_step(line, line_number)
+    step = string_to_step(line, line_number)
     %{steps: current_steps} = scenario
     %{scenario | steps: current_steps ++ [step]}
   end
@@ -50,11 +53,10 @@ defmodule Gherkin.Parser.Helpers.Steps do
   def string_to_step(string, line) do
     case string do
       "Given " <> text -> %Steps.Given{text: text, line: line}
-      "When " <> text  -> %Steps.When{text: text, line: line}
-      "Then " <> text  -> %Steps.Then{text: text, line: line}
-      "And " <> text  -> %Steps.And{text: text, line: line}
-      "But " <> text  -> %Steps.But{text: text, line: line}
+      "When " <> text -> %Steps.When{text: text, line: line}
+      "Then " <> text -> %Steps.Then{text: text, line: line}
+      "And " <> text -> %Steps.And{text: text, line: line}
+      "But " <> text -> %Steps.But{text: text, line: line}
     end
   end
-
 end

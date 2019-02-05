@@ -64,13 +64,12 @@ defmodule Gherkin do
 
     defmodule Steps do
       @moduledoc false
-      defmodule Given, do: defstruct text: "", table_data: [], doc_string: "", line: 0
-      defmodule When,  do: defstruct text: "", table_data: [], doc_string: "", line: 0
-      defmodule Then,  do: defstruct text: "", table_data: [], doc_string: "", line: 0
-      defmodule And,   do: defstruct text: "", table_data: [], doc_string: "", line: 0
-      defmodule But,   do: defstruct text: "", table_data: [], doc_string: "", line: 0
+      defmodule(Given, do: defstruct(text: "", table_data: [], doc_string: "", line: 0))
+      defmodule(When, do: defstruct(text: "", table_data: [], doc_string: "", line: 0))
+      defmodule(Then, do: defstruct(text: "", table_data: [], doc_string: "", line: 0))
+      defmodule(And, do: defstruct(text: "", table_data: [], doc_string: "", line: 0))
+      defmodule(But, do: defstruct(text: "", table_data: [], doc_string: "", line: 0))
     end
-
   end
 
   @doc """
@@ -82,19 +81,30 @@ defmodule Gherkin do
       outline = %Gherkin.Elements.ScenarioOutline{}
       Gherkin.scenarios_for(outline) |> Enum.each(&run_scenario/1)
   """
-  def scenarios_for(%Elements.ScenarioOutline{name: name, tags: tags, steps: steps, examples: examples, line: line}) do
+  def scenarios_for(%Elements.ScenarioOutline{
+        name: name,
+        tags: tags,
+        steps: steps,
+        examples: examples,
+        line: line
+      }) do
     examples
     |> Enum.with_index(1)
-    |> Enum.map(fn({example, index}) ->
+    |> Enum.map(fn {example, index} ->
       %Elements.Scenario{
         name: name <> " (Example #{index})",
         tags: tags,
         line: line,
-        steps: Enum.map(steps, fn(step)->
-          %{step | text: Enum.reduce(example, step.text, fn({k,v}, t)->
-            String.replace(t, ~r/<#{k}>/, v)
-          end)}
-        end)
+        steps:
+          Enum.map(steps, fn step ->
+            %{
+              step
+              | text:
+                  Enum.reduce(example, step.text, fn {k, v}, t ->
+                    String.replace(t, ~r/<#{k}>/, v)
+                  end)
+            }
+          end)
       }
     end)
   end
@@ -104,10 +114,16 @@ defmodule Gherkin do
   into `Gherkin.ElementScenario` as a flattened list of scenarios.
   """
   def flatten(feature = %Gherkin.Elements.Feature{scenarios: scenarios}) do
-    %{feature | scenarios: scenarios |> Enum.map(fn
-      scenario = %Gherkin.Elements.Scenario{} -> scenario # Nothing to do
-      outline = %Gherkin.Elements.ScenarioOutline{} -> scenarios_for(outline)
-    end) |> List.flatten()}
+    %{
+      feature
+      | scenarios:
+          scenarios
+          |> Enum.map(fn
+            # Nothing to do
+            scenario = %Gherkin.Elements.Scenario{} -> scenario
+            outline = %Gherkin.Elements.ScenarioOutline{} -> scenarios_for(outline)
+          end)
+          |> List.flatten()
+    }
   end
-
 end

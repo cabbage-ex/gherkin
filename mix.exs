@@ -9,8 +9,8 @@ defmodule Gherkin.Mixfile do
       elixir: "~> 1.3",
       source_url: "git@github.com:cabbage-ex/gherkin.git",
       homepage_url: "https://github.com/cabbage-ex/gherkin",
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       description: "Gherkin file parser for Elixir",
       docs: [
         main: Gherkin,
@@ -54,12 +54,11 @@ defmodule Gherkin.Mixfile do
   end
 
   defp aliases do
-    [publish: ["hex.publish", "hex.publish docs", "tag"],
-     tag: &tag_release/1]
+    [publish: ["hex.publish", "hex.publish docs", "tag"], tag: &tag_release/1]
   end
 
   defp tag_release(_) do
-    Mix.shell.info "Tagging release as #{@version}"
+    Mix.shell().info("Tagging release as #{@version}")
     System.cmd("git", ["tag", "-a", "v#{@version}", "-m", "v#{@version}"])
     System.cmd("git", ["push", "--tags"])
   end

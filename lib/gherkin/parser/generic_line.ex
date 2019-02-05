@@ -9,8 +9,8 @@ defmodule Gherkin.Parser.GenericLine do
 
   def process_line({line, line_number}, state) do
     line
-      |> log
-      |> process(state, line_number)
+    |> log
+    |> process(state, line_number)
   end
 
   defp process("", state, _line_number) do
@@ -66,7 +66,7 @@ defmodule Gherkin.Parser.GenericLine do
     DocStringParser.process_background_step_doc_string(line, feature, state)
   end
 
-  defp process(line, {feature, { :doc_string, _prev_state } = state}, _line_number) do
+  defp process(line, {feature, {:doc_string, _prev_state} = state}, _line_number) do
     DocStringParser.process_scenario_step_doc_string(line, feature, state)
   end
 
@@ -104,13 +104,16 @@ defmodule Gherkin.Parser.GenericLine do
 
   defp process_tag(tag) do
     case tag |> String.trim() |> String.split(" ") do
-      [t] -> String.to_atom(t)
+      [t] ->
+        String.to_atom(t)
+
       [t, v] ->
         case Float.parse(v) do
           {num, ""} ->
             # Convert from float to int if it is exactly
             num = if Float.floor(num) == num, do: round(num), else: num
             {String.to_atom(t), num}
+
           :error ->
             {String.to_atom(t), v}
         end
@@ -124,5 +127,4 @@ defmodule Gherkin.Parser.GenericLine do
 
   defp tags_from_state(%{tags: tags}), do: tags
   defp tags_from_state(_), do: []
-
 end

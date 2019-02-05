@@ -146,11 +146,12 @@ defmodule Gherkin.ParserTest do
 
   test "Parses the feature description" do
     assert %Feature{description: description, line: 1} = parse_feature(@feature_text)
+
     assert description == """
-    Coffee should not be served until paid for
-    Coffee should not be served until the button has been pressed
-    If there is no coffee left then money should be refunded
-    """
+           Coffee should not be served until paid for
+           Coffee should not be served until the button has been pressed
+           If there is no coffee left then money should be refunded
+           """
   end
 
   test "Parses the feature role from an 'As a XXXX' line" do
@@ -180,6 +181,7 @@ defmodule Gherkin.ParserTest do
       %Steps.When{text: "I press the coffee button", line: 9},
       %Steps.Then{text: "I should be served a coffee", line: 10}
     ]
+
     %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_text)
     assert expected_steps == steps
   end
@@ -189,16 +191,19 @@ defmodule Gherkin.ParserTest do
       %Steps.Given{text: "coffee exists as a beverage", line: 7},
       %Steps.And{text: "there is a coffee machine", line: 8}
     ]
+
     %{background_steps: background_steps} = parse_feature(@feature_with_backgroundtext)
     assert expected_steps == background_steps
   end
 
   test "Reads a doc string in to the correct step" do
     expected_data = "{\n  \"a\": \"b\"\n}\n"
+
     expected_steps = [
       %Steps.Given{text: "the following data", doc_string: expected_data, line: 6},
-      %Steps.Then{text: "everything should be okay", line: 12},
+      %Steps.Then{text: "everything should be okay", line: 12}
     ]
+
     %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_with_doc_string)
     assert expected_steps == steps
   end
@@ -207,10 +212,12 @@ defmodule Gherkin.ParserTest do
     exptected_table_data = [
       %{:"Column one" => "Hello", :"Column two" => "World"}
     ]
+
     expected_steps = [
       %Steps.Given{text: "the following table", table_data: exptected_table_data, line: 5},
-      %Steps.Then{text: "everything should be okay", line: 8},
+      %Steps.Then{text: "everything should be okay", line: 8}
     ]
+
     %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_with_step_with_table)
     assert expected_steps == steps
   end
@@ -220,24 +227,31 @@ defmodule Gherkin.ParserTest do
       %{start: "12", eat: "5", left: "7"},
       %{start: "20", eat: "5", left: "15"}
     ]
+
     expected_steps = [
       %Steps.Given{text: "there are <start> cucumbers", line: 4},
       %Steps.When{text: "I eat <eat> cucumbers", line: 5},
       %Steps.Then{text: "I should have <left> cucumbers", line: 6}
     ]
-    %{scenarios: [%{steps: steps, examples: examples} | _]} = parse_feature(@feature_with_scenario_outline)
+
+    %{scenarios: [%{steps: steps, examples: examples} | _]} =
+      parse_feature(@feature_with_scenario_outline)
+
     assert expected_steps == steps
     assert exptected_example_data == examples
   end
 
   test "Commented out lines are ignored" do
-    assert %Feature{scenarios: [%{steps: steps} | _], line: 1} = parse_feature(@feature__with_comments)
+    assert %Feature{scenarios: [%{steps: steps} | _], line: 1} =
+             parse_feature(@feature__with_comments)
+
     # Only should be 4 steps as the commented out line should be ignored
     assert Enum.count(steps) == 4
   end
 
   test "file streaming" do
-    assert %Gherkin.Elements.Feature{} = File.stream!("test/gherkin/parser/coffee.feature") |> parse_feature()
+    assert %Gherkin.Elements.Feature{} =
+             File.stream!("test/gherkin/parser/coffee.feature") |> parse_feature()
   end
 
   test "Reads a feature with a single tag" do
@@ -249,6 +263,7 @@ defmodule Gherkin.ParserTest do
   end
 
   test "Reads a feature with a multiple tags" do
-    assert %{tags: [:beverage, :coffee, :caffeine]} = parse_feature(@feature_with_multiple_feature_tag)
+    assert %{tags: [:beverage, :coffee, :caffeine]} =
+             parse_feature(@feature_with_multiple_feature_tag)
   end
 end
