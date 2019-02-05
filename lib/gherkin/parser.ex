@@ -14,12 +14,12 @@ defmodule Gherkin.Parser do
     %{feature | scenarios: Enum.reverse(scenarios)}
   end
 
-  def process_lines(%File.Stream{line_or_bytes: :line} = stream) do
+  defp process_lines(%File.Stream{line_or_bytes: :line} = stream) do
     {:ok, output} = Enum.reduce(stream, {:ok, []}, &process_line/2)
 
     Enum.reverse(output)
   end
-  def process_lines(string) do
+  defp process_lines(string) do
     {:ok, output} =
       string |> String.split(~r/\r?\n/)
              |> Enum.reduce({:ok, []}, &process_line/2)
