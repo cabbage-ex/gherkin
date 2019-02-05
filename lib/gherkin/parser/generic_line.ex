@@ -42,9 +42,18 @@ defmodule Gherkin.Parser.GenericLine do
     {feature, {:scenario_outline_example, []}}
   end
 
+  defp process("Scenarios:" <> _, {feature, _}, _line_number) do
+    {feature, {:scenario_outline_example, []}}
+  end
+
   defp process("Scenario: " <> name, {feature, state}, line_number) do
     tags = tags_from_state(state)
-    ScenarioParser.start_processing_scenario(feature, name, tags, line_number)
+    process_scenario(name, feature, tags, line_number)
+  end
+
+  defp process("Example: " <> name, {feature, state}, line_number) do
+    tags = tags_from_state(state)
+    process_scenario(name, feature, tags, line_number)
   end
 
   defp process("Scenario Outline: " <> name, {feature, state}, line_number) do
@@ -96,6 +105,10 @@ defmodule Gherkin.Parser.GenericLine do
     state
   end
 
+  defp process_scenario(name, feature, tags, line_number) do
+    ScenarioParser.start_processing_scenario(feature, name, tags, line_number)
+  end
+  
   defp process_tags(line) do
     line
     |> String.split("@", trim: true)
