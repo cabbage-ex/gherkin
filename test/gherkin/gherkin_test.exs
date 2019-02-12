@@ -1,6 +1,6 @@
 defmodule Gherkin.GherkinTest do
   use ExUnit.Case
-  alias Gherkin.Elements.Steps.{Given, And, When, Then}
+  alias Gherkin.Elements.Step
 
   @file_name "test/gherkin/parser/coffee.feature"
   test "parsing" do
@@ -17,10 +17,10 @@ defmodule Gherkin.GherkinTest do
       When I press the coffee button
       Then I should be served <served> coffees
 
-    Examples:
-      | coffees | money | served |
-      |  12     |  6    |  12    |
-      |  2      |  3    |  2     |
+      Examples:
+        | coffees | money | served |
+        |  12     |  6    |  12    |
+        |  2      |  3    |  2     |
   """
 
   test "changing an outline into a scenario" do
@@ -31,20 +31,20 @@ defmodule Gherkin.GherkinTest do
                name: "Buy coffee (Example 1)",
                line: 3,
                steps: [
-                 %Given{text: "there are 12 coffees left in the machine", line: 4},
-                 %And{text: "I have deposited $6", line: 5},
-                 %When{text: "I press the coffee button", line: 6},
-                 %Then{text: "I should be served 12 coffees", line: 7}
+                 %Step{keyword: "Given", text: "there are 12 coffees left in the machine", line: 4},
+                 %Step{keyword: "And", text: "I have deposited $6", line: 5},
+                 %Step{keyword: "When", text: "I press the coffee button", line: 6},
+                 %Step{keyword: "Then", text: "I should be served 12 coffees", line: 7}
                ]
              },
              %Gherkin.Elements.Scenario{
                name: "Buy coffee (Example 2)",
                line: 3,
                steps: [
-                 %Given{text: "there are 2 coffees left in the machine", line: 4},
-                 %And{text: "I have deposited $3", line: 5},
-                 %When{text: "I press the coffee button", line: 6},
-                 %Then{text: "I should be served 2 coffees", line: 7}
+                 %Step{keyword: "Given", text: "there are 2 coffees left in the machine", line: 4},
+                 %Step{keyword: "And", text: "I have deposited $3", line: 5},
+                 %Step{keyword: "When", text: "I press the coffee button", line: 6},
+                 %Step{keyword: "Then", text: "I should be served 2 coffees", line: 7}
                ]
              }
            ] = Gherkin.scenarios_for(feature.scenarios |> hd)

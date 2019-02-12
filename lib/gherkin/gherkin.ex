@@ -25,53 +25,6 @@ defmodule Gherkin do
     |> Gherkin.Parser.parse_feature(file_name)
   end
 
-  defmodule Elements do
-    @moduledoc false
-    defmodule Feature do
-      @moduledoc """
-      Representation of an entire feature. Contains scenarios which are the primary focus of the feature.
-      """
-      defstruct name: "",
-                description: "",
-                tags: [],
-                role: nil,
-                background_steps: [],
-                scenarios: [],
-                line: 0,
-                file: nil
-    end
-
-    defmodule Scenario do
-      @moduledoc """
-      Represents a single scenario within a feature. Contains steps which are the primary focus of the scenario.
-      """
-      defstruct name: "",
-                tags: [],
-                steps: [],
-                line: 0
-    end
-
-    defmodule ScenarioOutline do
-      @moduledoc """
-      Represents an outline of a single scenario.
-      """
-      defstruct name: "",
-                tags: [],
-                steps: [],
-                examples: [],
-                line: 0
-    end
-
-    defmodule Steps do
-      @moduledoc false
-      defmodule(Given, do: defstruct(text: "", table_data: [], doc_string: "", line: 0))
-      defmodule(When, do: defstruct(text: "", table_data: [], doc_string: "", line: 0))
-      defmodule(Then, do: defstruct(text: "", table_data: [], doc_string: "", line: 0))
-      defmodule(And, do: defstruct(text: "", table_data: [], doc_string: "", line: 0))
-      defmodule(But, do: defstruct(text: "", table_data: [], doc_string: "", line: 0))
-    end
-  end
-
   @doc """
   Changes a `Gherkin.Elements.ScenarioOutline` into multiple `Gherkin.Elements.Scenario`s
   so that they may be executed in the same manner.
@@ -81,17 +34,17 @@ defmodule Gherkin do
       outline = %Gherkin.Elements.ScenarioOutline{}
       Gherkin.scenarios_for(outline) |> Enum.each(&run_scenario/1)
   """
-  def scenarios_for(%Elements.ScenarioOutline{
+  def scenarios_for(%Gherkin.Elements.ScenarioOutline{
         name: name,
         tags: tags,
         steps: steps,
         examples: examples,
         line: line
-      }) do
+      } = scenario) do
     examples
     |> Enum.with_index(1)
     |> Enum.map(fn {example, index} ->
-      %Elements.Scenario{
+      %Gherkin.Elements.Scenario{
         name: name <> " (Example #{index})",
         tags: tags,
         line: line,

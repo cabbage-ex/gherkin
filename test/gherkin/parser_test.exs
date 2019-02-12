@@ -1,7 +1,8 @@
 defmodule Gherkin.ParserTest do
   use ExUnit.Case
   import Gherkin.Parser
-  alias Gherkin.Elements.Steps, as: Steps
+  alias Gherkin.Elements.Rule
+  alias Gherkin.Elements.Step
   alias Gherkin.Elements.Feature
 
   @feature_text """
@@ -107,13 +108,13 @@ defmodule Gherkin.ParserTest do
       When I eat <eat> cucumbers
       Then I should have <left> cucumbers
 
-    Examples:
-      | start | eat | left |
-      |  12   |  5  |  7   |
-      |  20   |  5  |  15  |
+      Examples:
+        | start | eat | left |
+        |  12   |  5  |  7   |
+        |  20   |  5  |  15  |
   """
 
-  @feature__with_comments """
+  @feature_with_comments """
     Feature: Serve coffee
       Coffee should not be served until paid for
       Coffee should not be served until the button has been pressed
@@ -128,15 +129,60 @@ defmodule Gherkin.ParserTest do
         Then I should be served a coffee
   """
 
-  @feature_with_role """
-  Feature: Serve coffee
-    As a Barrista
-    Coffee should not be served until paid for
-    Coffee should not be served until the button has been pressed
-    If there is no coffee left then money should be refunded
+  @feature_with_rule """
+    Feature: Serve coffee
+      Coffee should not be served until paid for
+      Coffee should not be served until the button has been pressed
+      If there is no coffee left then money should be refunded
 
-  Scenario: Buy last coffee
-    Given there are 1 coffees left in the machine
+      Rule: Coffee must be payed for
+        Background:
+          Given there are 1 coffees left in the machine
+
+        Scenario: Deposit money before buying coffee
+          Given I have deposited 1$
+          When I press the coffee button
+          Then I should be served a coffee
+
+        Scenario: Don't deposit money before buying coffee
+          Given I press the coffee button
+          Then I should not be served a coffee
+  """
+
+  @feature_with_multiple_rules """
+    Feature: Barista protocol
+      Always greet with a smile
+      Always ask for the customer's name
+
+      Rule: In a normal store
+        Background:
+          Given a customer has approached the till
+
+        Scenario: Customer speaks first
+          Given they place an order before Barista can greet
+          Then skip greeting and ask name
+          And serve with a smile
+
+        Scenario: Barista speaks first
+          Given Barista greets first
+          Then say common greeting and ask for order and name
+          And serve with a smile
+
+      Rule: In the Pentagon
+        For security purposes no names can be used at this location
+
+        Background:
+          Given a customer has approached the till
+
+        Scenario: Customer speaks first
+          Given they place an order before Barista can greet
+          Then skip greeting and give customer a unique order number
+          And serve with a smile
+
+        Scenario: Barista speaks first
+          Given Barista greets first
+          Then say common greeting and ask for order and give customer a unique order number
+          And serve with a smile
   """
 
   test "Parses the feature name" do
@@ -152,11 +198,6 @@ defmodule Gherkin.ParserTest do
            Coffee should not be served until the button has been pressed
            If there is no coffee left then money should be refunded
            """
-  end
-
-  test "Parses the feature role from an 'As a XXXX' line" do
-    assert %Feature{role: role, line: 1} = parse_feature(@feature_with_role)
-    assert role == "Barrista"
   end
 
   test "reads in the correct number of scenarios" do
@@ -176,10 +217,10 @@ defmodule Gherkin.ParserTest do
 
   test "Has the correct steps for a scenario" do
     expected_steps = [
-      %Steps.Given{text: "there are 1 coffees left in the machine", line: 7},
-      %Steps.And{text: "I have deposited 1$", line: 8},
-      %Steps.When{text: "I press the coffee button", line: 9},
-      %Steps.Then{text: "I should be served a coffee", line: 10}
+      %Step{keyword: "Given", text: "there are 1 coffees left in the machine", line: 7},
+      %Step{keyword: "And", text: "I have deposited 1$", line: 8},
+      %Step{keyword: "When", text: "I press the coffee button", line: 9},
+      %Step{keyword: "Then", text: "I should be served a coffee", line: 10}
     ]
 
     %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_text)
@@ -188,8 +229,8 @@ defmodule Gherkin.ParserTest do
 
   test "Parses the expected background steps" do
     expected_steps = [
-      %Steps.Given{text: "coffee exists as a beverage", line: 7},
-      %Steps.And{text: "there is a coffee machine", line: 8}
+      %Step{keyword: "Given", text: "coffee exists as a beverage", line: 7},
+      %Step{keyword: "And", text: "there is a coffee machine", line: 8}
     ]
 
     %{background_steps: background_steps} = parse_feature(@feature_with_backgroundtext)
@@ -200,8 +241,8 @@ defmodule Gherkin.ParserTest do
     expected_data = "{\n  \"a\": \"b\"\n}\n"
 
     expected_steps = [
-      %Steps.Given{text: "the following data", doc_string: expected_data, line: 6},
-      %Steps.Then{text: "everything should be okay", line: 12}
+      %Step{keyword: "Given", text: "the following data", doc_string: expected_data, line: 5},
+      %Step{keyword: "Then", text: "everything should be okay", line: 11}
     ]
 
     %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_with_doc_string)
@@ -214,8 +255,8 @@ defmodule Gherkin.ParserTest do
     ]
 
     expected_steps = [
-      %Steps.Given{text: "the following table", table_data: exptected_table_data, line: 5},
-      %Steps.Then{text: "everything should be okay", line: 8}
+      %Step{keyword: "Given", text: "the following table", table_data: exptected_table_data, line: 5},
+      %Step{keyword: "Then", text: "everything should be okay", line: 8}
     ]
 
     %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_with_step_with_table)
@@ -229,9 +270,9 @@ defmodule Gherkin.ParserTest do
     ]
 
     expected_steps = [
-      %Steps.Given{text: "there are <start> cucumbers", line: 4},
-      %Steps.When{text: "I eat <eat> cucumbers", line: 5},
-      %Steps.Then{text: "I should have <left> cucumbers", line: 6}
+      %Step{keyword: "Given", text: "there are <start> cucumbers", line: 4},
+      %Step{keyword: "When", text: "I eat <eat> cucumbers", line: 5},
+      %Step{keyword: "Then", text: "I should have <left> cucumbers", line: 6}
     ]
 
     %{scenarios: [%{steps: steps, examples: examples} | _]} =
@@ -243,7 +284,7 @@ defmodule Gherkin.ParserTest do
 
   test "Commented out lines are ignored" do
     assert %Feature{scenarios: [%{steps: steps} | _], line: 1} =
-             parse_feature(@feature__with_comments)
+             parse_feature(@feature_with_comments)
 
     # Only should be 4 steps as the commented out line should be ignored
     assert Enum.count(steps) == 4
@@ -265,5 +306,13 @@ defmodule Gherkin.ParserTest do
   test "Reads a feature with a multiple tags" do
     assert %{tags: [:beverage, :coffee, :caffeine]} =
              parse_feature(@feature_with_multiple_feature_tag)
+  end
+
+  test "Reads a feature with a rule" do
+    assert %{rules: [%Rule{} = _]} = parse_feature(@feature_with_rule)
+  end
+
+  test "Reads a feature with multiple rules" do
+    assert %{rules: [%Rule{}, %Rule{}]} =  parse_feature(@feature_with_multiple_rules)
   end
 end
