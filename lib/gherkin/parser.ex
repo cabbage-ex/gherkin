@@ -1,58 +1,74 @@
 defmodule Gherkin.Parser do
   @moduledoc false
-  alias Gherkin.Elements.Feature, as: Feature
-  alias Gherkin.Parser.GenericLine, as: LineParser
+  alias Gherkin.Parsers.FeatureParser
 
+  @doc """
+  Parses a string that represents a Gherkin feature document into Elixir terms.
+  """
   def parse_feature(feature_text, file_name \\ nil) do
     feature_text
-    |> process_lines()
-    |> parse_each_line(file_name)
-    |> correct_scenario_order()
+    |> transform_lines()
+    |> normalize_lines()
+    |> build_gherkin_document(file_name)
   end
 
-  defp correct_scenario_order(feature = %{scenarios: scenarios}) do
-    %{feature | scenarios: Enum.reverse(scenarios)}
+  defp transform_lines(%File.Stream{line_or_bytes: :line} = file_stream) do
+    transform_all_lines(file_stream)
   end
 
-  def process_lines(%File.Stream{line_or_bytes: :line} = stream) do
-    {:ok, output} = Enum.reduce(stream, {:ok, []}, &process_line/2)
-
-    Enum.reverse(output)
-  end
-  def process_lines(string) do
-    {:ok, output} =
-      string |> String.split(~r/\r?\n/)
-             |> Enum.reduce({:ok, []}, &process_line/2)
-
-    Enum.reverse(output)
+  defp transform_lines(string) do
+    string
+    |> String.split(~r/\r?\n/)
+    # If a string, rather than a file, was given strip leading empty lines to give a more intuitive line count.
+    |> Stream.drop_while(fn line -> line === "" end)
+    |> transform_all_lines()
   end
 
-  defp process_line(line, {state, lines}) do
-    process_line(String.trim_leading(line), {state, lines, line})
+  defp transform_all_lines(stream) do
+    stream
+    |> Stream.with_index(1)
+    |> Stream.map(&transform_line/1)
+  end
+  
+  defp transform_line({raw_line, line_number}) do
+    %Gherkin.Elements.Line{raw_text: raw_line, line_number: line_number}
+  end
+  
+  defp normalize_lines(lines) do
+    lines
+    |> Stream.map(&trim/1)
+    # Drop empty lines and comment lines as nothing will be done with them
+    |> Stream.filter(fn line -> line.text != "" and not String.starts_with?(line.text, "#") end)
+    |> Enum.reduce([], &normalize_line/2)
+    |> Enum.reverse()
   end
 
-  # Multiline / Doc string processing
-  defp process_line(line = ~s(""") <> _, {:ok, lines, original_line}) do
-    indent_length = String.length(original_line) -
-                    String.length(String.trim_leading(original_line))
-    {{:multiline, indent_length}, [ line | lines ]}
+  defp trim(line) do
+    %{line | text: String.trim_leading(line.raw_text)}
   end
-  defp process_line(line = ~s(""") <> _, {{:multiline, _}, lines, _}) do
-    {:ok, [ line | lines ]}
+
+  # Closing quotes for Doc String
+  defp normalize_line(%{text: ~s(""") <> _} = line, {{:multiline, _}, lines}) do
+    [line | lines]
   end
-  defp process_line(_, {{:multiline, indent} = state, lines, original_line}) do
-    {strippable, doc_string} = String.split_at(original_line, indent)
-    {state, [ String.trim_leading(strippable) <> doc_string | lines ]}
+
+  # Opening quotes for Doc String
+  defp normalize_line(%{text: ~s(""") <> _} = line, lines) do
+    indent_length = String.length(line.raw_text) - String.length(line.text)
+
+    {{:multiline, indent_length}, [line| lines]}
+  end
+
+  # Line between opening/closing quotes for Doc String
+  defp normalize_line(line, {{:multiline, indent} = multiline_state, lines}) do
+    {_, doc_string} = String.split_at(line.raw_text, indent)
+    {multiline_state, [%{line | text: doc_string} | lines]}
   end
 
   # Default processing
-  defp process_line(line, {:ok, lines, _}), do: {:ok, [ line | lines ]}
+  defp normalize_line(line, lines), do: [line| lines]
 
-  defp parse_each_line(lines, file) do
-    {feature, _end_state} = lines
-      |> Enum.with_index(1)
-      |> Enum.reduce({%Feature{file: file}, :start}, &LineParser.process_line/2)
-    feature
+  defp build_gherkin_document(lines, file) do
+    FeatureParser.build_feature(%Gherkin.Elements.Feature{file: file}, lines)
   end
-
 end
