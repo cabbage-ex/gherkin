@@ -1,5 +1,7 @@
 defmodule Gherkin.Parser do
   @moduledoc false
+  alias Gherkin.Elements.Feature
+  alias Gherkin.Keywords
   alias Gherkin.Parsers.FeatureParser
 
   @doc """
@@ -37,8 +39,8 @@ defmodule Gherkin.Parser do
   defp normalize_lines(lines) do
     lines
     |> Stream.map(&trim/1)
-    # Drop empty lines and comment lines as nothing will be done with them
-    |> Stream.filter(fn line -> line.text != "" and not String.starts_with?(line.text, "#") end)
+    # Drop empty lines and comment lines (but not language line) as nothing will be done with them
+    |> Stream.filter(fn line -> line.text != "" and not Regex.match?(~r/^#(?! language)/, line.text) end)
     |> Enum.reduce([], &normalize_line/2)
     |> Enum.reverse()
   end
@@ -56,7 +58,7 @@ defmodule Gherkin.Parser do
   defp normalize_line(%{text: ~s(""") <> _} = line, lines) do
     indent_length = String.length(line.raw_text) - String.length(line.text)
 
-    {{:multiline, indent_length}, [line| lines]}
+    {{:multiline, indent_length}, [line | lines]}
   end
 
   # Line between opening/closing quotes for Doc String
@@ -66,9 +68,17 @@ defmodule Gherkin.Parser do
   end
 
   # Default processing
-  defp normalize_line(line, lines), do: [line| lines]
+  defp normalize_line(line, lines), do: [line | lines]
 
   defp build_gherkin_document(lines, file) do
-    FeatureParser.build_feature(%Gherkin.Elements.Feature{file: file}, lines)
+    keywords = build_feature_keywords(List.first(lines))
+
+    FeatureParser.build_feature(%Feature{file: file}, lines, keywords)
   end
+
+  defp build_feature_keywords(%{text: "# language: " <> language}) do
+    Keywords.get_keywords(language)
+  end
+
+  defp build_feature_keywords(_), do: Keywords.get_keywords()
 end
