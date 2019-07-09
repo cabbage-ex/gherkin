@@ -41,6 +41,19 @@ defmodule Gherkin.ParserTest do
       Then I should be served a coffee
   """
 
+  @feature_in_french_text """
+    # language: fr
+      Fonctionnalité: Servir le café
+          Le café ne doit pas être servie avant d'être payé
+          Le café ne doit pas être servie avant que le bouton soit pressé
+          S'il n'y a plus de café l'argent doit être remboursé
+
+          Scénario: Acheter le dernier café
+            Etant donné qu'il n'y a plus qu'un café dans la machine
+            Et que j'ai déposé 1$
+            Quand je presse le bouton
+            Alors je dois avoir un café
+  """
   @feature_with_single_feature_tag """
   @beverage
   Feature: Serve coffee
@@ -249,6 +262,29 @@ defmodule Gherkin.ParserTest do
     assert expected_steps == steps
   end
 
+  test "Reads a feature in a different language" do
+    expected_steps = [
+      %Step{keyword: "Etant donné qu'", text: "il n'y a plus qu'un café dans la machine", line: 8},
+      %Step{keyword: "Et que", text: "j'ai déposé 1$", line: 9},
+      %Step{keyword: "Quand", text: "je presse le bouton", line: 10},
+      %Step{keyword: "Alors", text: "je dois avoir un café", line: 11}
+    ]
+
+    assert %Feature{
+             name: name,
+             description: description,
+             scenarios: [%{steps: steps} | _],
+             line: 2
+    } = parse_feature(@feature_in_french_text)
+    assert name == "Servir le café"
+    assert description == """
+           Le café ne doit pas être servie avant d'être payé
+           Le café ne doit pas être servie avant que le bouton soit pressé
+           S'il n'y a plus de café l'argent doit être remboursé
+           """
+    assert steps == expected_steps
+  end
+
   test "Reads a table in to the correct step" do
     exptected_table_data = [
       %{:"Column one" => "Hello", :"Column two" => "World"}
@@ -292,7 +328,8 @@ defmodule Gherkin.ParserTest do
 
   test "file streaming" do
     assert %Gherkin.Elements.Feature{} =
-             File.stream!("test/gherkin/parser/coffee.feature") |> parse_feature()
+             File.stream!("test/gherkin/parser/coffee.feature")
+             |> parse_feature()
   end
 
   test "Reads a feature with a single tag" do
@@ -313,6 +350,6 @@ defmodule Gherkin.ParserTest do
   end
 
   test "Reads a feature with multiple rules" do
-    assert %{rules: [%Rule{}, %Rule{}]} =  parse_feature(@feature_with_multiple_rules)
+    assert %{rules: [%Rule{}, %Rule{}]} = parse_feature(@feature_with_multiple_rules)
   end
 end
