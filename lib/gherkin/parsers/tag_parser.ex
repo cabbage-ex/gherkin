@@ -3,7 +3,10 @@ defmodule Gherkin.Parsers.TagParser do
 
   def process_tags(lines) do
     {tag_lines, remaining_lines} =
-      Enum.split_while(lines, fn %{text: "@" <> _} = _ -> true; _ -> false end)
+      Enum.split_while(lines, fn
+        %{text: "@" <> _} = _ -> true
+        _ -> false
+      end)
 
     {Enum.flat_map(tag_lines, &extract_tags/1), remaining_lines}
   end

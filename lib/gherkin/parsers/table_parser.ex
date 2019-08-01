@@ -8,11 +8,13 @@ defmodule Gherkin.Parsers.TableParser do
 
   defp parse_table_lines(keys, lines, kv_pairs \\ [])
   defp parse_table_lines(_keys, [], kv_pairs), do: {Enum.reverse(kv_pairs), []}
+
   defp parse_table_lines(keys, [line | lines] = all_lines, kv_pairs) do
     case line do
       %{text: "|" <> text} = _ ->
         new_row = Enum.zip(keys, table_line_to_columns(text)) |> Enum.into(Map.new())
         parse_table_lines(keys, lines, [new_row | kv_pairs])
+
       _ ->
         {Enum.reverse(kv_pairs), all_lines}
     end

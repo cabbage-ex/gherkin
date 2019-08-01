@@ -11,8 +11,11 @@ defmodule Gherkin.Parsers.ScenarioParser do
   end
 
   def build_scenario_outline(scenario_outline, all_lines) do
-    {updated_scenario_outline, remaining_lines} = DescriptionParser.build_description(scenario_outline, all_lines)
-    {updated_scenario_outline, [line | lines]} = StepParser.build_steps(updated_scenario_outline, remaining_lines)
+    {updated_scenario_outline, remaining_lines} =
+      DescriptionParser.build_description(scenario_outline, all_lines)
+
+    {updated_scenario_outline, [line | lines]} =
+      StepParser.build_steps(updated_scenario_outline, remaining_lines)
 
     if is_outline_keyword?(line.text) do
       {[header], table_lines} = Enum.split(lines, 1)
