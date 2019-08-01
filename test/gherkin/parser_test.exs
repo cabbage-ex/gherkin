@@ -185,6 +185,20 @@ defmodule Gherkin.ParserTest do
           And serve with a smile
   """
 
+  test "binary and stream is parsed exaclty the same" do
+    from_binary =
+      "test/fixtures/coffee.feature"
+      |> File.read!()
+      |> parse_feature()
+
+    from_stream =
+      "test/fixtures/coffee.feature"
+      |> File.stream!()
+      |> parse_feature()
+
+    assert from_binary == from_stream
+  end
+
   test "Parses the feature name" do
     assert %Feature{name: name, line: 1} = parse_feature(@feature_text)
     assert name == "Serve coffee"
@@ -297,7 +311,7 @@ defmodule Gherkin.ParserTest do
 
   test "file streaming" do
     assert %Gherkin.Elements.Feature{} =
-             File.stream!("test/gherkin/parser/coffee.feature") |> parse_feature()
+             File.stream!("test/fixtures/coffee.feature") |> parse_feature()
   end
 
   test "Reads a feature with a single tag" do

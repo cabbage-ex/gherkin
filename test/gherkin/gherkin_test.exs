@@ -2,7 +2,9 @@ defmodule Gherkin.GherkinTest do
   use ExUnit.Case
   alias Gherkin.Elements.Step
 
-  @file_name "test/gherkin/parser/coffee.feature"
+  doctest Gherkin
+
+  @file_name "test/fixtures/coffee.feature"
   test "parsing" do
     assert %Gherkin.Elements.Feature{scenarios: _scenarios, file: @file_name} =
              Gherkin.parse_file(@file_name)

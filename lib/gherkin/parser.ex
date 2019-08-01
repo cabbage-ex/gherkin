@@ -44,7 +44,7 @@ defmodule Gherkin.Parser do
   end
 
   defp trim(line) do
-    %{line | text: String.trim_leading(line.raw_text)}
+    %{line | text: String.trim(line.raw_text)}
   end
 
   # Closing quotes for Doc String
