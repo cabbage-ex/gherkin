@@ -255,7 +255,12 @@ defmodule Gherkin.ParserTest do
     ]
 
     expected_steps = [
-      %Step{keyword: "Given", text: "the following table", table_data: exptected_table_data, line: 5},
+      %Step{
+        keyword: "Given",
+        text: "the following table",
+        table_data: exptected_table_data,
+        line: 5
+      },
       %Step{keyword: "Then", text: "everything should be okay", line: 8}
     ]
 
@@ -313,6 +318,6 @@ defmodule Gherkin.ParserTest do
   end
 
   test "Reads a feature with multiple rules" do
-    assert %{rules: [%Rule{}, %Rule{}]} =  parse_feature(@feature_with_multiple_rules)
+    assert %{rules: [%Rule{}, %Rule{}]} = parse_feature(@feature_with_multiple_rules)
   end
 end

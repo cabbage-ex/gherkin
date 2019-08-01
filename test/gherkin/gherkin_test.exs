@@ -31,7 +31,11 @@ defmodule Gherkin.GherkinTest do
                name: "Buy coffee (Example 1)",
                line: 3,
                steps: [
-                 %Step{keyword: "Given", text: "there are 12 coffees left in the machine", line: 4},
+                 %Step{
+                   keyword: "Given",
+                   text: "there are 12 coffees left in the machine",
+                   line: 4
+                 },
                  %Step{keyword: "And", text: "I have deposited $6", line: 5},
                  %Step{keyword: "When", text: "I press the coffee button", line: 6},
                  %Step{keyword: "Then", text: "I should be served 12 coffees", line: 7}
@@ -41,7 +45,11 @@ defmodule Gherkin.GherkinTest do
                name: "Buy coffee (Example 2)",
                line: 3,
                steps: [
-                 %Step{keyword: "Given", text: "there are 2 coffees left in the machine", line: 4},
+                 %Step{
+                   keyword: "Given",
+                   text: "there are 2 coffees left in the machine",
+                   line: 4
+                 },
                  %Step{keyword: "And", text: "I have deposited $3", line: 5},
                  %Step{keyword: "When", text: "I press the coffee button", line: 6},
                  %Step{keyword: "Then", text: "I should be served 2 coffees", line: 7}

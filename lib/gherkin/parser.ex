@@ -29,11 +29,11 @@ defmodule Gherkin.Parser do
     |> Stream.with_index(1)
     |> Stream.map(&transform_line/1)
   end
-  
+
   defp transform_line({raw_line, line_number}) do
     %Gherkin.Elements.Line{raw_text: raw_line, line_number: line_number}
   end
-  
+
   defp normalize_lines(lines) do
     lines
     |> Stream.map(&trim/1)
@@ -56,7 +56,7 @@ defmodule Gherkin.Parser do
   defp normalize_line(%{text: ~s(""") <> _} = line, lines) do
     indent_length = String.length(line.raw_text) - String.length(line.text)
 
-    {{:multiline, indent_length}, [line| lines]}
+    {{:multiline, indent_length}, [line | lines]}
   end
 
   # Line between opening/closing quotes for Doc String
@@ -66,7 +66,7 @@ defmodule Gherkin.Parser do
   end
 
   # Default processing
-  defp normalize_line(line, lines), do: [line| lines]
+  defp normalize_line(line, lines), do: [line | lines]
 
   defp build_gherkin_document(lines, file) do
     FeatureParser.build_feature(%Gherkin.Elements.Feature{file: file}, lines)
