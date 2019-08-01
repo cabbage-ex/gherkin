@@ -18,7 +18,8 @@ defmodule Gherkin.Mixfile do
       ],
       package: package(),
       deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
@@ -41,7 +42,8 @@ defmodule Gherkin.Mixfile do
   defp deps do
     [
       {:ex_doc, "~> 0.18", only: :dev},
-      {:earmark, "~> 1.2", only: :dev}
+      {:earmark, "~> 1.2", only: :dev},
+      {:excoveralls, "~> 0.11.1", only: :test}
     ]
   end
 
