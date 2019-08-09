@@ -1,6 +1,6 @@
 defmodule Gherkin.ParserTest do
   use ExUnit.Case
-  import Gherkin.Parser
+  alias Gherkin.Parser
   alias Gherkin.Elements.Rule
   alias Gherkin.Elements.Step
   alias Gherkin.Elements.Feature
@@ -48,8 +48,8 @@ defmodule Gherkin.ParserTest do
     Coffee should not be served until the button has been pressed
     If there is no coffee left then money should be refunded
 
-  Scenario: Buy last coffee
-    Given there are 1 coffees left in the machine
+    Scenario: Buy last coffee
+      Given there are 1 coffees left in the machine
   """
 
   @feature_with_value_feature_tag """
@@ -59,8 +59,8 @@ defmodule Gherkin.ParserTest do
     Coffee should not be served until the button has been pressed
     If there is no coffee left then money should be refunded
 
-  Scenario: Buy last coffee
-    Given there are 1 coffees left in the machine
+    Scenario: Buy last coffee
+      Given there are 1 coffees left in the machine
   """
 
   @feature_with_multiple_feature_tag """
@@ -71,8 +71,8 @@ defmodule Gherkin.ParserTest do
     Coffee should not be served until the button has been pressed
     If there is no coffee left then money should be refunded
 
-  Scenario: Buy last coffee
-    Given there are 1 coffees left in the machine
+    Scenario: Buy last coffee
+      Given there are 1 coffees left in the machine
   """
 
   @feature_with_step_with_table """
@@ -189,121 +189,109 @@ defmodule Gherkin.ParserTest do
     from_binary =
       "test/fixtures/coffee.feature"
       |> File.read!()
-      |> parse_feature()
+      |> Parser.parse()
 
     from_stream =
       "test/fixtures/coffee.feature"
       |> File.stream!()
-      |> parse_feature()
+      |> Parser.parse()
 
-    assert from_binary == from_stream
+    assert "test/fixtures/coffee.feature" == from_stream.file
+    assert from_binary == Map.put(from_stream, :file, nil)
   end
 
-  test "Parses the feature name" do
-    assert %Feature{name: name, line: 1} = parse_feature(@feature_text)
-    assert name == "Serve coffee"
+  test "Parses the feature text" do
+    assert %Feature{text: "Serve coffee", line: 1} = Parser.parse(@feature_text)
   end
 
   test "Parses the feature description" do
-    assert %Feature{description: description, line: 1} = parse_feature(@feature_text)
+    assert %Feature{description: description, line: 1} = Parser.parse(@feature_text)
 
-    assert description == """
-           Coffee should not be served until paid for
-           Coffee should not be served until the button has been pressed
-           If there is no coffee left then money should be refunded
-           """
+    assert description ==
+             "Coffee should not be served until paid for\nCoffee should not be served until the button has been pressed\nIf there is no coffee left then money should be refunded"
   end
 
   test "reads in the correct number of scenarios" do
-    assert %Feature{scenarios: scenarios, line: 1} = parse_feature(@feature_text)
+    assert %Feature{scenarios: scenarios, line: 1} = Parser.parse(@feature_text)
     assert Enum.count(scenarios) == 2
   end
 
   test "Gets the scenario's name" do
-    assert %Feature{scenarios: [%{name: name} | _], line: 1} = parse_feature(@feature_text)
-    assert name == "Buy last coffee"
+    assert %Feature{scenarios: [%{text: text} | _], line: 1} = Parser.parse(@feature_text)
+    assert text == "Buy last coffee"
   end
 
   test "Gets the correct number of steps for the scenario" do
-    assert %Feature{scenarios: [%{steps: steps} | _], line: 1} = parse_feature(@feature_text)
+    assert %Feature{scenarios: [%{steps: steps} | _], line: 1} = Parser.parse(@feature_text)
     assert Enum.count(steps) == 4
   end
 
   test "Has the correct steps for a scenario" do
-    expected_steps = [
-      %Step{keyword: "Given", text: "there are 1 coffees left in the machine", line: 7},
-      %Step{keyword: "And", text: "I have deposited 1$", line: 8},
-      %Step{keyword: "When", text: "I press the coffee button", line: 9},
-      %Step{keyword: "Then", text: "I should be served a coffee", line: 10}
-    ]
+    assert %{scenarios: [%{steps: steps} | _]} = Parser.parse(@feature_text)
 
-    %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_text)
-    assert expected_steps == steps
+    assert [
+             %Step{type: :given, text: "there are 1 coffees left in the machine", line: 7},
+             %Step{type: :and, text: "I have deposited 1$", line: 8},
+             %Step{type: :when, text: "I press the coffee button", line: 9},
+             %Step{type: :then, text: "I should be served a coffee", line: 10}
+           ] = steps
   end
 
   test "Parses the expected background steps" do
-    expected_steps = [
-      %Step{keyword: "Given", text: "coffee exists as a beverage", line: 7},
-      %Step{keyword: "And", text: "there is a coffee machine", line: 8}
-    ]
+    assert %{background: %{steps: background_steps}} = Parser.parse(@feature_with_backgroundtext)
 
-    %{background_steps: background_steps} = parse_feature(@feature_with_backgroundtext)
-    assert expected_steps == background_steps
+    assert [
+             %Step{type: :given, text: "coffee exists as a beverage", line: 7},
+             %Step{type: :and, text: "there is a coffee machine", line: 8}
+           ] = background_steps
   end
 
   test "Reads a doc string in to the correct step" do
-    expected_data = "{\n  \"a\": \"b\"\n}\n"
+    expected_data = "{\n  \"a\": \"b\"\n}"
 
-    expected_steps = [
-      %Step{keyword: "Given", text: "the following data", doc_string: expected_data, line: 5},
-      %Step{keyword: "Then", text: "everything should be okay", line: 11}
-    ]
+    expected_steps = %{scenarios: [%{steps: steps} | _]} = Parser.parse(@feature_with_doc_string)
 
-    %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_with_doc_string)
-    assert expected_steps == steps
+    assert [
+             %Step{type: :given, text: "the following data", doc_string: expected_data, line: 5},
+             %Step{type: :then, text: "everything should be okay", line: 11}
+           ] = steps
   end
 
   test "Reads a table in to the correct step" do
-    exptected_table_data = [
-      %{:"Column one" => "Hello", :"Column two" => "World"}
-    ]
+    assert %{scenarios: [%{steps: steps} | _]} = Parser.parse(@feature_with_step_with_table)
 
-    expected_steps = [
-      %Step{
-        keyword: "Given",
-        text: "the following table",
-        table_data: exptected_table_data,
-        line: 5
-      },
-      %Step{keyword: "Then", text: "everything should be okay", line: 8}
-    ]
-
-    %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_with_step_with_table)
-    assert expected_steps == steps
+    assert [
+             %Step{
+               type: :given,
+               text: "the following table",
+               data_table: [
+                 %{:"Column one" => "Hello", :"Column two" => "World"}
+               ],
+               line: 5
+             },
+             %Step{type: :then, text: "everything should be okay", line: 8}
+           ] = steps
   end
 
   test "Reads Scenario outlines correctly" do
-    exptected_example_data = [
-      %{start: "12", eat: "5", left: "7"},
-      %{start: "20", eat: "5", left: "15"}
-    ]
+    assert %{scenarios: [%{steps: steps, examples: examples} | _]} =
+             Parser.parse(@feature_with_scenario_outline)
 
-    expected_steps = [
-      %Step{keyword: "Given", text: "there are <start> cucumbers", line: 4},
-      %Step{keyword: "When", text: "I eat <eat> cucumbers", line: 5},
-      %Step{keyword: "Then", text: "I should have <left> cucumbers", line: 6}
-    ]
+    assert [
+             %Step{type: :given, text: "there are <start> cucumbers", line: 4},
+             %Step{type: :when, text: "I eat <eat> cucumbers", line: 5},
+             %Step{type: :then, text: "I should have <left> cucumbers", line: 6}
+           ] = steps
 
-    %{scenarios: [%{steps: steps, examples: examples} | _]} =
-      parse_feature(@feature_with_scenario_outline)
-
-    assert expected_steps == steps
-    assert exptected_example_data == examples
+    assert [
+             %{start: "12", eat: "5", left: "7"},
+             %{start: "20", eat: "5", left: "15"}
+           ] = examples
   end
 
   test "Commented out lines are ignored" do
     assert %Feature{scenarios: [%{steps: steps} | _], line: 1} =
-             parse_feature(@feature_with_comments)
+             Parser.parse(@feature_with_comments)
 
     # Only should be 4 steps as the commented out line should be ignored
     assert Enum.count(steps) == 4
@@ -311,27 +299,27 @@ defmodule Gherkin.ParserTest do
 
   test "file streaming" do
     assert %Gherkin.Elements.Feature{} =
-             File.stream!("test/fixtures/coffee.feature") |> parse_feature()
+             File.stream!("test/fixtures/coffee.feature") |> Parser.parse()
   end
 
   test "Reads a feature with a single tag" do
-    assert %{tags: [:beverage]} = parse_feature(@feature_with_single_feature_tag)
+    assert %{tags: [:beverage]} = Parser.parse(@feature_with_single_feature_tag)
   end
 
   test "Reads a feature with a value tag" do
-    assert %{tags: [{:cost, 1}]} = parse_feature(@feature_with_value_feature_tag)
+    assert %{tags: [{:cost, 1}]} = Parser.parse(@feature_with_value_feature_tag)
   end
 
   test "Reads a feature with a multiple tags" do
     assert %{tags: [:beverage, :coffee, :caffeine]} =
-             parse_feature(@feature_with_multiple_feature_tag)
+             Parser.parse(@feature_with_multiple_feature_tag)
   end
 
   test "Reads a feature with a rule" do
-    assert %{rules: [%Rule{} = _]} = parse_feature(@feature_with_rule)
+    assert %{rules: [%Rule{} = _]} = Parser.parse(@feature_with_rule)
   end
 
   test "Reads a feature with multiple rules" do
-    assert %{rules: [%Rule{}, %Rule{}]} = parse_feature(@feature_with_multiple_rules)
+    assert %{rules: [%Rule{}, %Rule{}]} = Parser.parse(@feature_with_multiple_rules)
   end
 end

@@ -43,7 +43,8 @@ defmodule Gherkin.Mixfile do
     [
       {:ex_doc, "~> 0.18", only: :dev},
       {:earmark, "~> 1.2", only: :dev},
-      {:excoveralls, "~> 0.11.1", only: :test}
+      {:excoveralls, "~> 0.11.1", only: :test},
+      {:jason, "~> 1.1"}
     ]
   end
 
