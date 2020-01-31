@@ -41,6 +41,16 @@ defmodule Gherkin.ParserTest do
       Then I should be served a coffee
   """
 
+  @feature_with_scenario_description """
+  Feature: Have scenario descriptions
+
+    Scenario: I have a description and a step
+      This is the description
+
+      When this step is not part of the description
+      Then everything should be okay
+  """
+
   @feature_with_single_feature_tag """
   @beverage
   Feature: Serve coffee
@@ -239,6 +249,17 @@ defmodule Gherkin.ParserTest do
 
     %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_text)
     assert expected_steps == steps
+  end
+
+  test "Excludes steps from the scenario descriptions" do
+    %{scenarios: [%{description: description, steps: steps}]} =
+      parse_feature(@feature_with_scenario_description)
+
+    assert description == """
+           This is the description
+           """
+
+    assert Enum.count(steps) == 2
   end
 
   test "Parses the expected background steps" do
