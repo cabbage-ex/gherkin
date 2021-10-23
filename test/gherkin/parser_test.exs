@@ -86,6 +86,20 @@ defmodule Gherkin.ParserTest do
       Then everything should be okay
   """
 
+  @feature_with_step_with_table_containing_pipes """
+  Feature: Have tables
+    Sometimes data is a table
+
+    Scenario: I have a step with a table
+      Given the following table
+      | Column one | Column two                |
+      | Hello      | World                     |
+      | Goodbye    | It's all\\|folks!         |
+      | Goodbye    | It's\\|all\\|folks!       |
+      | Goodbye    | Backslash and pipe: \\\\| |
+      Then everything should be okay
+  """
+
   @feature_with_doc_string "
   Feature: Have tables
     Sometimes data is a table
@@ -279,6 +293,30 @@ defmodule Gherkin.ParserTest do
     ]
 
     %{scenarios: [%{steps: steps} | _]} = parse_feature(@feature_with_step_with_table)
+    assert expected_steps == steps
+  end
+
+  test "Reads in a table containing pipes to the correct step" do
+    expected_table_data = [
+      %{:"Column one" => "Hello", :"Column two" => "World"},
+      %{:"Column one" => "Goodbye", :"Column two" => "It's all|folks!"},
+      %{:"Column one" => "Goodbye", :"Column two" => "It's|all|folks!"},
+      %{:"Column one" => "Goodbye", :"Column two" => "Backslash and pipe: \\|"}
+    ]
+
+    expected_steps = [
+      %Step{
+        keyword: "Given",
+        text: "the following table",
+        table_data: expected_table_data,
+        line: 5
+      },
+      %Step{keyword: "Then", text: "everything should be okay", line: 11}
+    ]
+
+    %{scenarios: [%{steps: steps} | _]} =
+      parse_feature(@feature_with_step_with_table_containing_pipes)
+
     assert expected_steps == steps
   end
 
