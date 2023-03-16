@@ -7,14 +7,15 @@ defmodule Gherkin.Mixfile do
       app: :gherkin,
       version: @version,
       elixir: "~> 1.3",
-      source_url: "git@github.com:cabbage-ex/gherkin.git",
+      source_url: "https://github.com/cabbage-ex/gherkin",
       homepage_url: "https://github.com/cabbage-ex/gherkin",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       description: "Gherkin file parser for Elixir",
       docs: [
         main: Gherkin,
-        readme: "README.md"
+        readme: "README.md",
+        source_ref: "master"
       ],
       package: package(),
       deps: deps(),
