@@ -1,4 +1,4 @@
-# Gherkin [![Hex.pm](https://img.shields.io/hexpm/v/gherkin.svg)]()
+# Gherkin [![Hex.pm](https://img.shields.io/hexpm/v/gherkin.svg)](https://hex.pm/packages/gherkin)
 
 [![Coverage Status](https://coveralls.io/repos/github/cabbage-ex/gherkin/badge.svg?branch=master)](https://coveralls.io/github/cabbage-ex/gherkin?branch=master)
 [![CircleCI](https://circleci.com/gh/cabbage-ex/gherkin.svg?style=svg)](https://circleci.com/gh/cabbage-ex/gherkin)
