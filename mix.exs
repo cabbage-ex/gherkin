@@ -41,8 +41,8 @@ defmodule Gherkin.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:ex_doc, "~> 0.18", only: :dev},
-      {:earmark, "~> 1.2", only: :dev},
+      {:ex_doc, "~> 0.29", only: :dev},
+      {:earmark, "~> 1.4", only: :dev},
       {:excoveralls, "~> 0.16.0", only: :test}
     ]
   end
