@@ -86,6 +86,20 @@ defmodule Gherkin.ParserTest do
       Then everything should be okay
   """
 
+  @feature_with_step_with_table_containing_pipes ~S"""
+  Feature: Have tables
+    Sometimes data is a table
+
+    Scenario: I have a step with a table
+      Given the following table
+      | Column one | Column two              |
+      | Hello      | World                   |
+      | Goodbye    | It's all\|folks!        |
+      | Goodbye    | It's\|all\|folks!       |
+      | Goodbye    | Backslash and pipe: \\| |
+      Then everything should be okay
+  """
+
   @feature_with_doc_string "
   Feature: Have tables
     Sometimes data is a table
@@ -264,7 +278,7 @@ defmodule Gherkin.ParserTest do
   end
 
   test "Reads a table in to the correct step" do
-    exptected_table_data = [
+    expected_table_data = [
       %{:"Column one" => "Hello", :"Column two" => "World"}
     ]
 
@@ -272,7 +286,7 @@ defmodule Gherkin.ParserTest do
       %Step{
         keyword: "Given",
         text: "the following table",
-        table_data: exptected_table_data,
+        table_data: expected_table_data,
         line: 5
       },
       %Step{keyword: "Then", text: "everything should be okay", line: 8}
@@ -282,8 +296,32 @@ defmodule Gherkin.ParserTest do
     assert expected_steps == steps
   end
 
+  test "Reads in a table containing pipes to the correct step" do
+    expected_table_data = [
+      %{:"Column one" => "Hello", :"Column two" => "World"},
+      %{:"Column one" => "Goodbye", :"Column two" => "It's all|folks!"},
+      %{:"Column one" => "Goodbye", :"Column two" => "It's|all|folks!"},
+      %{:"Column one" => "Goodbye", :"Column two" => "Backslash and pipe: \\|"}
+    ]
+
+    expected_steps = [
+      %Step{
+        keyword: "Given",
+        text: "the following table",
+        table_data: expected_table_data,
+        line: 5
+      },
+      %Step{keyword: "Then", text: "everything should be okay", line: 11}
+    ]
+
+    %{scenarios: [%{steps: steps} | _]} =
+      parse_feature(@feature_with_step_with_table_containing_pipes)
+
+    assert expected_steps == steps
+  end
+
   test "Reads Scenario outlines correctly" do
-    exptected_example_data = [
+    expected_example_data = [
       %{start: "12", eat: "5", left: "7"},
       %{start: "20", eat: "5", left: "15"}
     ]
@@ -298,7 +336,7 @@ defmodule Gherkin.ParserTest do
       parse_feature(@feature_with_scenario_outline)
 
     assert expected_steps == steps
-    assert exptected_example_data == examples
+    assert expected_example_data == examples
   end
 
   test "Commented out lines are ignored" do

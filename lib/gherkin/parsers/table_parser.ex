@@ -1,6 +1,8 @@
 defmodule Gherkin.Parsers.TableParser do
   @moduledoc false
 
+  @column_separator ~r/(?<!\\)\|/
+
   def parse_table(header_line, table_lines) do
     keys = table_line_to_columns(header_line) |> Enum.map(&String.to_atom/1)
     parse_table_lines(keys, table_lines)
@@ -22,7 +24,10 @@ defmodule Gherkin.Parsers.TableParser do
 
   defp table_line_to_columns(line) do
     line
-    |> String.split("|", trim: true)
+    |> String.split(@column_separator, trim: true)
     |> Enum.map(&String.trim/1)
+    |> Enum.map(&unescape_pipes/1)
   end
+
+  defp unescape_pipes(cell), do: String.replace(cell, ~S(\|), "|")
 end
