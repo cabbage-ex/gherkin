@@ -86,17 +86,17 @@ defmodule Gherkin.ParserTest do
       Then everything should be okay
   """
 
-  @feature_with_step_with_table_containing_pipes """
+  @feature_with_step_with_table_containing_pipes ~S"""
   Feature: Have tables
     Sometimes data is a table
 
     Scenario: I have a step with a table
       Given the following table
-      | Column one | Column two                |
-      | Hello      | World                     |
-      | Goodbye    | It's all\\|folks!         |
-      | Goodbye    | It's\\|all\\|folks!       |
-      | Goodbye    | Backslash and pipe: \\\\| |
+      | Column one | Column two              |
+      | Hello      | World                   |
+      | Goodbye    | It's all\|folks!        |
+      | Goodbye    | It's\|all\|folks!       |
+      | Goodbye    | Backslash and pipe: \\| |
       Then everything should be okay
   """
 
