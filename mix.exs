@@ -1,7 +1,7 @@
 defmodule Gherkin.Mixfile do
   use Mix.Project
 
-  @version "1.6.1"
+  @version "2.0.0"
   def project do
     [
       app: :gherkin,
