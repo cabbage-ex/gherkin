@@ -11,20 +11,9 @@ Extracted from https://github.com/meadsteve/white-bread
 
 The package can be installed as:
 
-  1. Add `gherkin` to your list of dependencies in `mix.exs`:
-
-
 ```elixir
 def deps do
-  [{:gherkin, "~> 1.0"}]
-end
-```
-
-  2. Ensure `gherkin` is started before your application:
-
-```elixir
-def application do
-  [applications: [:gherkin]]
+  [{:gherkin, "~> 2.0"}]
 end
 ```
 
