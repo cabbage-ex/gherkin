@@ -28,7 +28,7 @@ defmodule Gherkin.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :runtime_tools]]
   end
 
   # Dependencies can be Hex packages:
@@ -42,9 +42,8 @@ defmodule Gherkin.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:ex_doc, "~> 0.29", only: :dev},
-      {:earmark, "~> 1.4", only: :dev},
-      {:excoveralls, "~> 0.16.0", only: :test}
+      {:ex_doc, "~> 0.29", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.10", only: :test}
     ]
   end
 
